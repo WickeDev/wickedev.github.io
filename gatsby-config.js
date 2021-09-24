@@ -1,9 +1,41 @@
+const fs = require('fs')
+const { buildSchema, buildClientSchema } = require('graphql')
+
 module.exports = {
   siteMetadata: {
-    siteUrl: "https://www.yourdomain.tld",
+    siteUrl: "https://www.codesanctum.net",
     title: "wickedev blog",
   },
   plugins: [
+    {
+      resolve: `gatsby-plugin-typescript`,
+      options: {
+        isTSX: true,
+        jsxPragma: `@emotion/react`,
+        allExtensions: true,
+      },
+    },
+    {
+      resolve: `gatsby-plugin-typegen`,
+      options: {
+        outputPath: `src/__generated__/gatsby-types.d.ts`,
+      },
+    },
+    {
+      resolve: "gatsby-source-graphql",
+      options: {
+        typeName: "Velog",
+        fieldName: "velog",
+        url: "https://v2.velog.io/graphql",
+        createSchema: async () => {
+          const json = JSON.parse(
+            fs.readFileSync(`external-schema/velog-introspection.json`)
+          )
+          return buildClientSchema(json)
+        },
+      }
+    },
+    'gatsby-transformer-remark',
     "gatsby-plugin-emotion",
     "gatsby-plugin-image",
     {
