@@ -28,7 +28,7 @@ const options = {
     },
 }
 
-exports.sourceNodes = async (
+exports.createSchemaCustomization = async (
     { actions, createNodeId, cache, createContentDigest }
 ) => {
     const { addThirdPartySchema, createNode } = actions
