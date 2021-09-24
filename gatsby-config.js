@@ -21,7 +21,7 @@ module.exports = {
         outputPath: `src/__generated__/gatsby-types.d.ts`,
       },
     },
-    {
+    /* {
       resolve: "gatsby-source-graphql",
       options: {
         typeName: "Velog",
@@ -34,7 +34,7 @@ module.exports = {
           return buildClientSchema(json)
         },
       }
-    },
+    }, */
     'gatsby-transformer-remark',
     "gatsby-plugin-emotion",
     "gatsby-plugin-image",
