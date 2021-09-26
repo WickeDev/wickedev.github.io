@@ -21,21 +21,13 @@ module.exports = {
         outputPath: `src/__generated__/gatsby-types.d.ts`,
       },
     },
-    /* {
-      resolve: "gatsby-source-graphql",
+    {
+      resolve: 'gatsby-source-velog',
       options: {
-        typeName: "Velog",
-        fieldName: "velog",
-        url: "https://v2.velog.io/graphql",
-        createSchema: async () => {
-          const json = JSON.parse(
-            fs.readFileSync(`external-schema/velog-introspection.json`)
-          )
-          return buildClientSchema(json)
-        },
-      }
-    }, */
-    'gatsby-transformer-remark',
+        username: 'wickedev',
+      },
+    },
+    "gatsby-transformer-remark",
     "gatsby-plugin-emotion",
     "gatsby-plugin-image",
     {

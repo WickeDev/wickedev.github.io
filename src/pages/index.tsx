@@ -1,34 +1,40 @@
-import { useStaticQuery, graphql } from 'gatsby';
-import * as React from "react"
+import { useStaticQuery, graphql, Link } from 'gatsby';
 
-const VelogPosts = () => {
-  const res = useStaticQuery<GatsbyTypes.VelogPostsQuery>(graphql`
-      query VelogPosts {
-          velog {
-              posts(username: "wickedev") {
-              id
-              title
-              body
-              }
+const LatestPostListQuery = graphql`
+  query LatestPostListQuery {
+    allMarkdownRemark(sort: { order: DESC, fields: frontmatter___title }) {
+      edges {
+        node {
+          excerpt(truncate: true, pruneLength: 200)
+          frontmatter {
+            title
           }
-      } 
-`)
-
-  return <pre>
-    {JSON.stringify(res, null, 4)}
-  </pre>
-}
+          id
+        }
+      }
+    }
+  }
+`;
 
 const IndexPage = () => {
+  const data = useStaticQuery(LatestPostListQuery);
+
   return (
     <main>
-      <title>Home Page</title>
-      <h1>
-        Wickedev Blog
-      </h1>
-      <VelogPosts />
+      <h1>최근 작성한 게시글 목록</h1>
+      <ul>
+        {data.allMarkdownRemark.edges.map(({ node }: any) => (
+          <li key={node.id}>
+            <h2>
+              <Link to={node.frontmatter.path}>{node.frontmatter.title}</Link>
+            </h2>
+            <h3>{node.frontmatter.date}</h3>
+            <p>{node.excerpt}</p>
+            <hr />
+          </li>
+        ))}
+      </ul>
     </main>
-  )
-}
-
+  );
+};
 export default IndexPage

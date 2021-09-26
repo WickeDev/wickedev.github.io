@@ -21,8 +21,6 @@ type Scalars = {
   Date: string;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: never;
-  Velog_Date: any;
-  Velog_JSON: any;
 };
 
 
@@ -70,6 +68,7 @@ type File = Node & {
   readonly birthtimeMs: Maybe<Scalars['Float']>;
   readonly blksize: Maybe<Scalars['Int']>;
   readonly blocks: Maybe<Scalars['Int']>;
+  readonly url: Maybe<Scalars['String']>;
   /** Copy file to static directory and return public url to it */
   readonly publicURL: Maybe<Scalars['String']>;
   /** Returns all children nodes filtered by type ImageSharp */
@@ -259,6 +258,8 @@ type Directory_ctimeArgs = {
 type Site = Node & {
   readonly buildTime: Maybe<Scalars['Date']>;
   readonly siteMetadata: Maybe<SiteSiteMetadata>;
+  readonly port: Maybe<Scalars['Int']>;
+  readonly host: Maybe<Scalars['String']>;
   readonly polyfill: Maybe<Scalars['Boolean']>;
   readonly pathPrefix: Maybe<Scalars['String']>;
   readonly id: Scalars['ID'];
@@ -364,6 +365,9 @@ type SitePluginPluginOptions = {
   readonly createLinkInHead: Maybe<Scalars['Boolean']>;
   readonly entryLimit: Maybe<Scalars['Int']>;
   readonly query: Maybe<Scalars['String']>;
+  readonly username: Maybe<Scalars['String']>;
+  readonly baseUrl: Maybe<Scalars['String']>;
+  readonly endpoint: Maybe<Scalars['String']>;
 };
 
 type SitePluginPackageJson = {
@@ -409,6 +413,100 @@ type SiteBuildMetadata_buildTimeArgs = {
   locale: Maybe<Scalars['String']>;
 };
 
+type VelogUser = Node & {
+  readonly velogId: Scalars['String'];
+  readonly velogUrl: Scalars['String'];
+  readonly username: Scalars['String'];
+  readonly displayName: Scalars['String'];
+  readonly bio: Maybe<Scalars['String']>;
+  readonly aboutHtml: Maybe<Scalars['String']>;
+  readonly isCertified: Scalars['Boolean'];
+  readonly thumbnail: Maybe<File>;
+  readonly socialProfile: VelogUserSocialProfile;
+  readonly posts: ReadonlyArray<VelogPost>;
+  readonly id: Scalars['ID'];
+  readonly parent: Maybe<Node>;
+  readonly children: ReadonlyArray<Node>;
+  readonly internal: Internal;
+};
+
+type VelogUserSocialProfile = {
+  readonly url: Maybe<Scalars['String']>;
+  readonly email: Maybe<Scalars['String']>;
+  readonly github: Maybe<Scalars['String']>;
+  readonly facebook: Maybe<Scalars['String']>;
+  readonly twitter: Maybe<Scalars['String']>;
+};
+
+type VelogTag = Node & {
+  readonly velogId: Scalars['String'];
+  readonly velogUrl: Scalars['String'];
+  readonly owner: VelogUser;
+  readonly name: Scalars['String'];
+  readonly description: Maybe<Scalars['String']>;
+  readonly thumbnail: Maybe<File>;
+  readonly posts: ReadonlyArray<VelogPost>;
+  readonly id: Scalars['ID'];
+  readonly parent: Maybe<Node>;
+  readonly children: ReadonlyArray<Node>;
+  readonly internal: Internal;
+};
+
+type VelogPost = Node & {
+  readonly velogId: Scalars['String'];
+  readonly velogUrl: Scalars['String'];
+  readonly slug: Scalars['String'];
+  readonly title: Scalars['String'];
+  readonly rawContent: Scalars['String'];
+  readonly shortDescription: Scalars['String'];
+  readonly thumbnail: Maybe<Scalars['String']>;
+  readonly publishedAt: Scalars['Date'];
+  readonly updatedAt: Scalars['Date'];
+  readonly author: VelogUser;
+  readonly tags: ReadonlyArray<VelogTag>;
+  readonly series: Maybe<VelogPostSeries>;
+  readonly id: Scalars['ID'];
+  readonly parent: Maybe<Node>;
+  readonly children: ReadonlyArray<Node>;
+  readonly internal: Internal;
+};
+
+
+type VelogPost_publishedAtArgs = {
+  formatString: Maybe<Scalars['String']>;
+  fromNow: Maybe<Scalars['Boolean']>;
+  difference: Maybe<Scalars['String']>;
+  locale: Maybe<Scalars['String']>;
+};
+
+
+type VelogPost_updatedAtArgs = {
+  formatString: Maybe<Scalars['String']>;
+  fromNow: Maybe<Scalars['Boolean']>;
+  difference: Maybe<Scalars['String']>;
+  locale: Maybe<Scalars['String']>;
+};
+
+type VelogPostSeries = {
+  readonly index: Scalars['Int'];
+  readonly node: VelogSeries;
+};
+
+type VelogSeries = Node & {
+  readonly velogId: Scalars['String'];
+  readonly velogUrl: Scalars['String'];
+  readonly name: Scalars['String'];
+  readonly description: Maybe<Scalars['String']>;
+  readonly slug: Scalars['String'];
+  readonly thumbnail: Maybe<File>;
+  readonly owner: VelogUser;
+  readonly posts: ReadonlyArray<VelogPost>;
+  readonly id: Scalars['ID'];
+  readonly parent: Maybe<Node>;
+  readonly children: ReadonlyArray<Node>;
+  readonly internal: Internal;
+};
+
 type MarkdownHeading = {
   readonly id: Maybe<Scalars['String']>;
   readonly value: Maybe<Scalars['String']>;
@@ -436,9 +534,11 @@ type MarkdownWordCount = {
 
 type MarkdownRemark = Node & {
   readonly id: Scalars['ID'];
+  readonly frontmatter: Maybe<MarkdownRemarkFrontmatter>;
+  readonly excerpt: Maybe<Scalars['String']>;
+  readonly rawMarkdownBody: Maybe<Scalars['String']>;
   readonly html: Maybe<Scalars['String']>;
   readonly htmlAst: Maybe<Scalars['JSON']>;
-  readonly excerpt: Maybe<Scalars['String']>;
   readonly excerptAst: Maybe<Scalars['JSON']>;
   readonly headings: Maybe<ReadonlyArray<Maybe<MarkdownHeading>>>;
   readonly timeToRead: Maybe<Scalars['Int']>;
@@ -473,6 +573,10 @@ type MarkdownRemark_tableOfContentsArgs = {
   pathToSlugField?: Maybe<Scalars['String']>;
   maxDepth: Maybe<Scalars['Int']>;
   heading: Maybe<Scalars['String']>;
+};
+
+type MarkdownRemarkFrontmatter = {
+  readonly title: Maybe<Scalars['String']>;
 };
 
 
@@ -783,285 +887,6 @@ type ImageSharpResize = {
   readonly originalName: Maybe<Scalars['String']>;
 };
 
-type GraphQLSource = Node & {
-  readonly id: Scalars['ID'];
-  readonly parent: Maybe<Node>;
-  readonly children: ReadonlyArray<Node>;
-  readonly internal: Internal;
-  readonly typeName: Maybe<Scalars['String']>;
-  readonly fieldName: Maybe<Scalars['String']>;
-};
-
-type Velog_User = {
-  readonly id: Scalars['ID'];
-  readonly username: Maybe<Scalars['String']>;
-  readonly email: Maybe<Scalars['String']>;
-  readonly created_at: Maybe<Scalars['Velog_Date']>;
-  readonly updated_at: Maybe<Scalars['Velog_Date']>;
-  readonly is_certified: Maybe<Scalars['Boolean']>;
-  readonly profile: Maybe<Velog_UserProfile>;
-  readonly velog_config: Maybe<Velog_VelogConfig>;
-  readonly series_list: Maybe<ReadonlyArray<Maybe<Velog_Series>>>;
-  readonly user_meta: Maybe<Velog_UserMeta>;
-};
-
-
-type Velog_UserProfile = {
-  readonly id: Scalars['ID'];
-  readonly display_name: Maybe<Scalars['String']>;
-  readonly short_bio: Maybe<Scalars['String']>;
-  readonly thumbnail: Maybe<Scalars['String']>;
-  readonly created_at: Maybe<Scalars['Velog_Date']>;
-  readonly updated_at: Maybe<Scalars['Velog_Date']>;
-  readonly about: Maybe<Scalars['String']>;
-  readonly profile_links: Maybe<Scalars['Velog_JSON']>;
-};
-
-
-type Velog_VelogConfig = {
-  readonly id: Scalars['ID'];
-  readonly title: Maybe<Scalars['String']>;
-  readonly logo_image: Maybe<Scalars['String']>;
-};
-
-type Velog_Series = {
-  readonly id: Scalars['ID'];
-  readonly user: Maybe<Velog_User>;
-  readonly name: Maybe<Scalars['String']>;
-  readonly description: Maybe<Scalars['String']>;
-  readonly url_slug: Maybe<Scalars['String']>;
-  readonly created_at: Maybe<Scalars['Velog_Date']>;
-  readonly updated_at: Maybe<Scalars['Velog_Date']>;
-  readonly series_posts: Maybe<ReadonlyArray<Maybe<Velog_SeriesPost>>>;
-  readonly thumbnail: Maybe<Scalars['String']>;
-  readonly posts_count: Maybe<Scalars['Int']>;
-};
-
-type Velog_SeriesPost = {
-  readonly id: Scalars['ID'];
-  readonly index: Maybe<Scalars['Int']>;
-  readonly post: Maybe<Velog_Post>;
-};
-
-type Velog_Post = {
-  readonly id: Scalars['ID'];
-  readonly title: Maybe<Scalars['String']>;
-  readonly body: Maybe<Scalars['String']>;
-  readonly thumbnail: Maybe<Scalars['String']>;
-  readonly is_markdown: Maybe<Scalars['Boolean']>;
-  readonly is_temp: Maybe<Scalars['Boolean']>;
-  readonly user: Maybe<Velog_User>;
-  readonly url_slug: Maybe<Scalars['String']>;
-  readonly likes: Maybe<Scalars['Int']>;
-  readonly meta: Maybe<Scalars['Velog_JSON']>;
-  readonly views: Maybe<Scalars['Int']>;
-  readonly is_private: Maybe<Scalars['Boolean']>;
-  readonly released_at: Maybe<Scalars['Velog_Date']>;
-  readonly created_at: Maybe<Scalars['Velog_Date']>;
-  readonly updated_at: Maybe<Scalars['Velog_Date']>;
-  readonly short_description: Maybe<Scalars['String']>;
-  readonly comments: Maybe<ReadonlyArray<Maybe<Velog_Comment>>>;
-  readonly tags: Maybe<ReadonlyArray<Maybe<Scalars['String']>>>;
-  readonly comments_count: Maybe<Scalars['Int']>;
-  readonly series: Maybe<Velog_Series>;
-  readonly liked: Maybe<Scalars['Boolean']>;
-  readonly linked_posts: Maybe<Velog_LinkedPosts>;
-  readonly last_read_at: Maybe<Scalars['Velog_Date']>;
-  readonly recommended_posts: Maybe<ReadonlyArray<Maybe<Velog_Post>>>;
-};
-
-type Velog_Comment = {
-  readonly id: Scalars['ID'];
-  readonly text: Maybe<Scalars['String']>;
-  readonly likes: Maybe<Scalars['Int']>;
-  readonly level: Maybe<Scalars['Int']>;
-  readonly has_replies: Maybe<Scalars['Boolean']>;
-  readonly deleted: Maybe<Scalars['Boolean']>;
-  readonly user: Maybe<Velog_User>;
-  readonly replies: Maybe<ReadonlyArray<Maybe<Velog_Comment>>>;
-  readonly created_at: Maybe<Scalars['Velog_Date']>;
-  readonly replies_count: Maybe<Scalars['Int']>;
-};
-
-type Velog_LinkedPosts = {
-  readonly previous: Maybe<Velog_Post>;
-  readonly next: Maybe<Velog_Post>;
-};
-
-type Velog_UserMeta = {
-  readonly id: Scalars['ID'];
-  readonly email_notification: Maybe<Scalars['Boolean']>;
-  readonly email_promotion: Maybe<Scalars['Boolean']>;
-};
-
-type Velog_SearchResult = {
-  readonly count: Maybe<Scalars['Int']>;
-  readonly posts: Maybe<ReadonlyArray<Maybe<Velog_Post>>>;
-};
-
-type Velog_PostHistory = {
-  readonly id: Maybe<Scalars['ID']>;
-  readonly fk_post_id: Maybe<Scalars['ID']>;
-  readonly title: Maybe<Scalars['String']>;
-  readonly body: Maybe<Scalars['String']>;
-  readonly is_markdown: Maybe<Scalars['Boolean']>;
-  readonly created_at: Maybe<Scalars['Velog_Date']>;
-};
-
-type Velog_ReadingListOption =
-  | 'LIKED'
-  | 'READ';
-
-type Velog_Stats = {
-  readonly total: Maybe<Scalars['Int']>;
-  readonly count_by_day: Maybe<ReadonlyArray<Maybe<Velog_ReadCountByDay>>>;
-};
-
-type Velog_ReadCountByDay = {
-  readonly count: Maybe<Scalars['Int']>;
-  readonly day: Maybe<Scalars['Velog_Date']>;
-};
-
-type Velog_Tag = {
-  readonly id: Scalars['ID'];
-  readonly name: Maybe<Scalars['String']>;
-  readonly description: Maybe<Scalars['String']>;
-  readonly thumbnail: Maybe<Scalars['String']>;
-  readonly created_at: Maybe<Scalars['String']>;
-  readonly posts_count: Maybe<Scalars['Int']>;
-};
-
-type Velog_UserTags = {
-  readonly tags: Maybe<ReadonlyArray<Maybe<Velog_Tag>>>;
-  readonly posts_count: Maybe<Scalars['Int']>;
-};
-
-type Velog = {
-  readonly _version: Maybe<Scalars['String']>;
-  readonly user: Maybe<Velog_User>;
-  readonly velog_config: Maybe<Velog_VelogConfig>;
-  readonly auth: Maybe<Velog_User>;
-  readonly unregister_token: Maybe<Scalars['String']>;
-  readonly post: Maybe<Velog_Post>;
-  readonly posts: Maybe<ReadonlyArray<Maybe<Velog_Post>>>;
-  readonly trendingPosts: Maybe<ReadonlyArray<Maybe<Velog_Post>>>;
-  readonly searchPosts: Maybe<Velog_SearchResult>;
-  readonly postHistories: Maybe<ReadonlyArray<Maybe<Velog_PostHistory>>>;
-  readonly lastPostHistory: Maybe<Velog_PostHistory>;
-  readonly readingList: Maybe<ReadonlyArray<Maybe<Velog_Post>>>;
-  readonly getStats: Maybe<Velog_Stats>;
-  readonly comment: Maybe<Velog_Comment>;
-  readonly subcomments: Maybe<ReadonlyArray<Maybe<Velog_Comment>>>;
-  readonly series: Maybe<Velog_Series>;
-  readonly seriesList: Maybe<ReadonlyArray<Maybe<Velog_Series>>>;
-  readonly tags: Maybe<ReadonlyArray<Maybe<Velog_Tag>>>;
-  readonly tag: Maybe<Velog_Tag>;
-  readonly userTags: Maybe<Velog_UserTags>;
-};
-
-
-type Velog_userArgs = {
-  id: Maybe<Scalars['ID']>;
-  username: Maybe<Scalars['String']>;
-};
-
-
-type Velog_velog_configArgs = {
-  username: Maybe<Scalars['String']>;
-};
-
-
-type Velog_postArgs = {
-  id: Maybe<Scalars['ID']>;
-  username: Maybe<Scalars['String']>;
-  url_slug: Maybe<Scalars['String']>;
-};
-
-
-type Velog_postsArgs = {
-  cursor: Maybe<Scalars['ID']>;
-  limit: Maybe<Scalars['Int']>;
-  username: Maybe<Scalars['String']>;
-  temp_only: Maybe<Scalars['Boolean']>;
-  tag: Maybe<Scalars['String']>;
-};
-
-
-type Velog_trendingPostsArgs = {
-  offset: Maybe<Scalars['Int']>;
-  limit: Maybe<Scalars['Int']>;
-  timeframe: Maybe<Scalars['String']>;
-};
-
-
-type Velog_searchPostsArgs = {
-  keyword: Scalars['String'];
-  offset: Maybe<Scalars['Int']>;
-  limit: Maybe<Scalars['Int']>;
-  username: Maybe<Scalars['String']>;
-};
-
-
-type Velog_postHistoriesArgs = {
-  post_id: Maybe<Scalars['ID']>;
-};
-
-
-type Velog_lastPostHistoryArgs = {
-  post_id: Scalars['ID'];
-};
-
-
-type Velog_readingListArgs = {
-  type: Maybe<Velog_ReadingListOption>;
-  cursor: Maybe<Scalars['ID']>;
-  limit: Maybe<Scalars['Int']>;
-};
-
-
-type Velog_getStatsArgs = {
-  post_id: Scalars['ID'];
-};
-
-
-type Velog_commentArgs = {
-  comment_id: Maybe<Scalars['ID']>;
-};
-
-
-type Velog_subcommentsArgs = {
-  comment_id: Maybe<Scalars['ID']>;
-};
-
-
-type Velog_seriesArgs = {
-  id: Maybe<Scalars['ID']>;
-  username: Maybe<Scalars['String']>;
-  url_slug: Maybe<Scalars['String']>;
-};
-
-
-type Velog_seriesListArgs = {
-  username: Maybe<Scalars['String']>;
-};
-
-
-type Velog_tagsArgs = {
-  sort: Scalars['String'];
-  cursor: Maybe<Scalars['ID']>;
-  limit: Maybe<Scalars['Int']>;
-};
-
-
-type Velog_tagArgs = {
-  name: Scalars['String'];
-};
-
-
-type Velog_userTagsArgs = {
-  username: Maybe<Scalars['String']>;
-};
-
 type Query = {
   readonly file: Maybe<File>;
   readonly allFile: FileConnection;
@@ -1077,15 +902,20 @@ type Query = {
   readonly allSitePlugin: SitePluginConnection;
   readonly siteBuildMetadata: Maybe<SiteBuildMetadata>;
   readonly allSiteBuildMetadata: SiteBuildMetadataConnection;
+  readonly velogUser: Maybe<VelogUser>;
+  readonly allVelogUser: VelogUserConnection;
+  readonly velogTag: Maybe<VelogTag>;
+  readonly allVelogTag: VelogTagConnection;
+  readonly velogPost: Maybe<VelogPost>;
+  readonly allVelogPost: VelogPostConnection;
+  readonly velogSeries: Maybe<VelogSeries>;
+  readonly allVelogSeries: VelogSeriesConnection;
   readonly markdownRemark: Maybe<MarkdownRemark>;
   readonly allMarkdownRemark: MarkdownRemarkConnection;
   readonly mdx: Maybe<Mdx>;
   readonly allMdx: MdxConnection;
   readonly imageSharp: Maybe<ImageSharp>;
   readonly allImageSharp: ImageSharpConnection;
-  readonly graphQlSource: Maybe<GraphQLSource>;
-  readonly allGraphQlSource: GraphQLSourceConnection;
-  readonly velog: Velog;
 };
 
 
@@ -1123,6 +953,7 @@ type Query_fileArgs = {
   birthtimeMs: Maybe<FloatQueryOperatorInput>;
   blksize: Maybe<IntQueryOperatorInput>;
   blocks: Maybe<IntQueryOperatorInput>;
+  url: Maybe<StringQueryOperatorInput>;
   publicURL: Maybe<StringQueryOperatorInput>;
   childrenImageSharp: Maybe<ImageSharpFilterListInput>;
   childImageSharp: Maybe<ImageSharpFilterInput>;
@@ -1193,6 +1024,8 @@ type Query_allDirectoryArgs = {
 type Query_siteArgs = {
   buildTime: Maybe<DateQueryOperatorInput>;
   siteMetadata: Maybe<SiteSiteMetadataFilterInput>;
+  port: Maybe<IntQueryOperatorInput>;
+  host: Maybe<StringQueryOperatorInput>;
   polyfill: Maybe<BooleanQueryOperatorInput>;
   pathPrefix: Maybe<StringQueryOperatorInput>;
   id: Maybe<StringQueryOperatorInput>;
@@ -1300,11 +1133,114 @@ type Query_allSiteBuildMetadataArgs = {
 };
 
 
+type Query_velogUserArgs = {
+  velogId: Maybe<StringQueryOperatorInput>;
+  velogUrl: Maybe<StringQueryOperatorInput>;
+  username: Maybe<StringQueryOperatorInput>;
+  displayName: Maybe<StringQueryOperatorInput>;
+  bio: Maybe<StringQueryOperatorInput>;
+  aboutHtml: Maybe<StringQueryOperatorInput>;
+  isCertified: Maybe<BooleanQueryOperatorInput>;
+  thumbnail: Maybe<FileFilterInput>;
+  socialProfile: Maybe<VelogUserSocialProfileFilterInput>;
+  posts: Maybe<VelogPostFilterListInput>;
+  id: Maybe<StringQueryOperatorInput>;
+  parent: Maybe<NodeFilterInput>;
+  children: Maybe<NodeFilterListInput>;
+  internal: Maybe<InternalFilterInput>;
+};
+
+
+type Query_allVelogUserArgs = {
+  filter: Maybe<VelogUserFilterInput>;
+  sort: Maybe<VelogUserSortInput>;
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+};
+
+
+type Query_velogTagArgs = {
+  velogId: Maybe<StringQueryOperatorInput>;
+  velogUrl: Maybe<StringQueryOperatorInput>;
+  owner: Maybe<VelogUserFilterInput>;
+  name: Maybe<StringQueryOperatorInput>;
+  description: Maybe<StringQueryOperatorInput>;
+  thumbnail: Maybe<FileFilterInput>;
+  posts: Maybe<VelogPostFilterListInput>;
+  id: Maybe<StringQueryOperatorInput>;
+  parent: Maybe<NodeFilterInput>;
+  children: Maybe<NodeFilterListInput>;
+  internal: Maybe<InternalFilterInput>;
+};
+
+
+type Query_allVelogTagArgs = {
+  filter: Maybe<VelogTagFilterInput>;
+  sort: Maybe<VelogTagSortInput>;
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+};
+
+
+type Query_velogPostArgs = {
+  velogId: Maybe<StringQueryOperatorInput>;
+  velogUrl: Maybe<StringQueryOperatorInput>;
+  slug: Maybe<StringQueryOperatorInput>;
+  title: Maybe<StringQueryOperatorInput>;
+  rawContent: Maybe<StringQueryOperatorInput>;
+  shortDescription: Maybe<StringQueryOperatorInput>;
+  thumbnail: Maybe<StringQueryOperatorInput>;
+  publishedAt: Maybe<DateQueryOperatorInput>;
+  updatedAt: Maybe<DateQueryOperatorInput>;
+  author: Maybe<VelogUserFilterInput>;
+  tags: Maybe<VelogTagFilterListInput>;
+  series: Maybe<VelogPostSeriesFilterInput>;
+  id: Maybe<StringQueryOperatorInput>;
+  parent: Maybe<NodeFilterInput>;
+  children: Maybe<NodeFilterListInput>;
+  internal: Maybe<InternalFilterInput>;
+};
+
+
+type Query_allVelogPostArgs = {
+  filter: Maybe<VelogPostFilterInput>;
+  sort: Maybe<VelogPostSortInput>;
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+};
+
+
+type Query_velogSeriesArgs = {
+  velogId: Maybe<StringQueryOperatorInput>;
+  velogUrl: Maybe<StringQueryOperatorInput>;
+  name: Maybe<StringQueryOperatorInput>;
+  description: Maybe<StringQueryOperatorInput>;
+  slug: Maybe<StringQueryOperatorInput>;
+  thumbnail: Maybe<FileFilterInput>;
+  owner: Maybe<VelogUserFilterInput>;
+  posts: Maybe<VelogPostFilterListInput>;
+  id: Maybe<StringQueryOperatorInput>;
+  parent: Maybe<NodeFilterInput>;
+  children: Maybe<NodeFilterListInput>;
+  internal: Maybe<InternalFilterInput>;
+};
+
+
+type Query_allVelogSeriesArgs = {
+  filter: Maybe<VelogSeriesFilterInput>;
+  sort: Maybe<VelogSeriesSortInput>;
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+};
+
+
 type Query_markdownRemarkArgs = {
   id: Maybe<StringQueryOperatorInput>;
+  frontmatter: Maybe<MarkdownRemarkFrontmatterFilterInput>;
+  excerpt: Maybe<StringQueryOperatorInput>;
+  rawMarkdownBody: Maybe<StringQueryOperatorInput>;
   html: Maybe<StringQueryOperatorInput>;
   htmlAst: Maybe<JSONQueryOperatorInput>;
-  excerpt: Maybe<StringQueryOperatorInput>;
   excerptAst: Maybe<JSONQueryOperatorInput>;
   headings: Maybe<MarkdownHeadingFilterListInput>;
   timeToRead: Maybe<IntQueryOperatorInput>;
@@ -1368,24 +1304,6 @@ type Query_imageSharpArgs = {
 type Query_allImageSharpArgs = {
   filter: Maybe<ImageSharpFilterInput>;
   sort: Maybe<ImageSharpSortInput>;
-  skip: Maybe<Scalars['Int']>;
-  limit: Maybe<Scalars['Int']>;
-};
-
-
-type Query_graphQlSourceArgs = {
-  id: Maybe<StringQueryOperatorInput>;
-  parent: Maybe<NodeFilterInput>;
-  children: Maybe<NodeFilterListInput>;
-  internal: Maybe<InternalFilterInput>;
-  typeName: Maybe<StringQueryOperatorInput>;
-  fieldName: Maybe<StringQueryOperatorInput>;
-};
-
-
-type Query_allGraphQlSourceArgs = {
-  filter: Maybe<GraphQLSourceFilterInput>;
-  sort: Maybe<GraphQLSourceSortInput>;
   skip: Maybe<Scalars['Int']>;
   limit: Maybe<Scalars['Int']>;
 };
@@ -1618,6 +1536,7 @@ type FileFieldsEnum =
   | 'birthtimeMs'
   | 'blksize'
   | 'blocks'
+  | 'url'
   | 'publicURL'
   | 'childrenImageSharp'
   | 'childrenImageSharp.fixed.base64'
@@ -1922,6 +1841,7 @@ type FileFilterInput = {
   readonly birthtimeMs: Maybe<FloatQueryOperatorInput>;
   readonly blksize: Maybe<IntQueryOperatorInput>;
   readonly blocks: Maybe<IntQueryOperatorInput>;
+  readonly url: Maybe<StringQueryOperatorInput>;
   readonly publicURL: Maybe<StringQueryOperatorInput>;
   readonly childrenImageSharp: Maybe<ImageSharpFilterListInput>;
   readonly childImageSharp: Maybe<ImageSharpFilterInput>;
@@ -2248,6 +2168,8 @@ type SiteFieldsEnum =
   | 'siteMetadata.title'
   | 'siteMetadata.description'
   | 'siteMetadata.siteUrl'
+  | 'port'
+  | 'host'
   | 'polyfill'
   | 'pathPrefix'
   | 'id'
@@ -2381,6 +2303,8 @@ type SiteGroupConnection_groupArgs = {
 type SiteFilterInput = {
   readonly buildTime: Maybe<DateQueryOperatorInput>;
   readonly siteMetadata: Maybe<SiteSiteMetadataFilterInput>;
+  readonly port: Maybe<IntQueryOperatorInput>;
+  readonly host: Maybe<StringQueryOperatorInput>;
   readonly polyfill: Maybe<BooleanQueryOperatorInput>;
   readonly pathPrefix: Maybe<StringQueryOperatorInput>;
   readonly id: Maybe<StringQueryOperatorInput>;
@@ -2647,6 +2571,9 @@ type SitePluginPluginOptionsFilterInput = {
   readonly createLinkInHead: Maybe<BooleanQueryOperatorInput>;
   readonly entryLimit: Maybe<IntQueryOperatorInput>;
   readonly query: Maybe<StringQueryOperatorInput>;
+  readonly username: Maybe<StringQueryOperatorInput>;
+  readonly baseUrl: Maybe<StringQueryOperatorInput>;
+  readonly endpoint: Maybe<StringQueryOperatorInput>;
 };
 
 type SitePluginPackageJsonFilterInput = {
@@ -2869,6 +2796,9 @@ type SitePageFieldsEnum =
   | 'pluginCreator.pluginOptions.createLinkInHead'
   | 'pluginCreator.pluginOptions.entryLimit'
   | 'pluginCreator.pluginOptions.query'
+  | 'pluginCreator.pluginOptions.username'
+  | 'pluginCreator.pluginOptions.baseUrl'
+  | 'pluginCreator.pluginOptions.endpoint'
   | 'pluginCreator.packageJson.name'
   | 'pluginCreator.packageJson.description'
   | 'pluginCreator.packageJson.version'
@@ -3076,6 +3006,9 @@ type SitePluginFieldsEnum =
   | 'pluginOptions.createLinkInHead'
   | 'pluginOptions.entryLimit'
   | 'pluginOptions.query'
+  | 'pluginOptions.username'
+  | 'pluginOptions.baseUrl'
+  | 'pluginOptions.endpoint'
   | 'packageJson.name'
   | 'packageJson.description'
   | 'packageJson.version'
@@ -3412,6 +3345,2729 @@ type SiteBuildMetadataSortInput = {
   readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
 };
 
+type VelogUserSocialProfileFilterInput = {
+  readonly url: Maybe<StringQueryOperatorInput>;
+  readonly email: Maybe<StringQueryOperatorInput>;
+  readonly github: Maybe<StringQueryOperatorInput>;
+  readonly facebook: Maybe<StringQueryOperatorInput>;
+  readonly twitter: Maybe<StringQueryOperatorInput>;
+};
+
+type VelogPostFilterListInput = {
+  readonly elemMatch: Maybe<VelogPostFilterInput>;
+};
+
+type VelogPostFilterInput = {
+  readonly velogId: Maybe<StringQueryOperatorInput>;
+  readonly velogUrl: Maybe<StringQueryOperatorInput>;
+  readonly slug: Maybe<StringQueryOperatorInput>;
+  readonly title: Maybe<StringQueryOperatorInput>;
+  readonly rawContent: Maybe<StringQueryOperatorInput>;
+  readonly shortDescription: Maybe<StringQueryOperatorInput>;
+  readonly thumbnail: Maybe<StringQueryOperatorInput>;
+  readonly publishedAt: Maybe<DateQueryOperatorInput>;
+  readonly updatedAt: Maybe<DateQueryOperatorInput>;
+  readonly author: Maybe<VelogUserFilterInput>;
+  readonly tags: Maybe<VelogTagFilterListInput>;
+  readonly series: Maybe<VelogPostSeriesFilterInput>;
+  readonly id: Maybe<StringQueryOperatorInput>;
+  readonly parent: Maybe<NodeFilterInput>;
+  readonly children: Maybe<NodeFilterListInput>;
+  readonly internal: Maybe<InternalFilterInput>;
+};
+
+type VelogUserFilterInput = {
+  readonly velogId: Maybe<StringQueryOperatorInput>;
+  readonly velogUrl: Maybe<StringQueryOperatorInput>;
+  readonly username: Maybe<StringQueryOperatorInput>;
+  readonly displayName: Maybe<StringQueryOperatorInput>;
+  readonly bio: Maybe<StringQueryOperatorInput>;
+  readonly aboutHtml: Maybe<StringQueryOperatorInput>;
+  readonly isCertified: Maybe<BooleanQueryOperatorInput>;
+  readonly thumbnail: Maybe<FileFilterInput>;
+  readonly socialProfile: Maybe<VelogUserSocialProfileFilterInput>;
+  readonly posts: Maybe<VelogPostFilterListInput>;
+  readonly id: Maybe<StringQueryOperatorInput>;
+  readonly parent: Maybe<NodeFilterInput>;
+  readonly children: Maybe<NodeFilterListInput>;
+  readonly internal: Maybe<InternalFilterInput>;
+};
+
+type VelogTagFilterListInput = {
+  readonly elemMatch: Maybe<VelogTagFilterInput>;
+};
+
+type VelogTagFilterInput = {
+  readonly velogId: Maybe<StringQueryOperatorInput>;
+  readonly velogUrl: Maybe<StringQueryOperatorInput>;
+  readonly owner: Maybe<VelogUserFilterInput>;
+  readonly name: Maybe<StringQueryOperatorInput>;
+  readonly description: Maybe<StringQueryOperatorInput>;
+  readonly thumbnail: Maybe<FileFilterInput>;
+  readonly posts: Maybe<VelogPostFilterListInput>;
+  readonly id: Maybe<StringQueryOperatorInput>;
+  readonly parent: Maybe<NodeFilterInput>;
+  readonly children: Maybe<NodeFilterListInput>;
+  readonly internal: Maybe<InternalFilterInput>;
+};
+
+type VelogPostSeriesFilterInput = {
+  readonly index: Maybe<IntQueryOperatorInput>;
+  readonly node: Maybe<VelogSeriesFilterInput>;
+};
+
+type VelogSeriesFilterInput = {
+  readonly velogId: Maybe<StringQueryOperatorInput>;
+  readonly velogUrl: Maybe<StringQueryOperatorInput>;
+  readonly name: Maybe<StringQueryOperatorInput>;
+  readonly description: Maybe<StringQueryOperatorInput>;
+  readonly slug: Maybe<StringQueryOperatorInput>;
+  readonly thumbnail: Maybe<FileFilterInput>;
+  readonly owner: Maybe<VelogUserFilterInput>;
+  readonly posts: Maybe<VelogPostFilterListInput>;
+  readonly id: Maybe<StringQueryOperatorInput>;
+  readonly parent: Maybe<NodeFilterInput>;
+  readonly children: Maybe<NodeFilterListInput>;
+  readonly internal: Maybe<InternalFilterInput>;
+};
+
+type VelogUserConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<VelogUserEdge>;
+  readonly nodes: ReadonlyArray<VelogUser>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly max: Maybe<Scalars['Float']>;
+  readonly min: Maybe<Scalars['Float']>;
+  readonly sum: Maybe<Scalars['Float']>;
+  readonly group: ReadonlyArray<VelogUserGroupConnection>;
+};
+
+
+type VelogUserConnection_distinctArgs = {
+  field: VelogUserFieldsEnum;
+};
+
+
+type VelogUserConnection_maxArgs = {
+  field: VelogUserFieldsEnum;
+};
+
+
+type VelogUserConnection_minArgs = {
+  field: VelogUserFieldsEnum;
+};
+
+
+type VelogUserConnection_sumArgs = {
+  field: VelogUserFieldsEnum;
+};
+
+
+type VelogUserConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: VelogUserFieldsEnum;
+};
+
+type VelogUserEdge = {
+  readonly next: Maybe<VelogUser>;
+  readonly node: VelogUser;
+  readonly previous: Maybe<VelogUser>;
+};
+
+type VelogUserFieldsEnum =
+  | 'velogId'
+  | 'velogUrl'
+  | 'username'
+  | 'displayName'
+  | 'bio'
+  | 'aboutHtml'
+  | 'isCertified'
+  | 'thumbnail.sourceInstanceName'
+  | 'thumbnail.absolutePath'
+  | 'thumbnail.relativePath'
+  | 'thumbnail.extension'
+  | 'thumbnail.size'
+  | 'thumbnail.prettySize'
+  | 'thumbnail.modifiedTime'
+  | 'thumbnail.accessTime'
+  | 'thumbnail.changeTime'
+  | 'thumbnail.birthTime'
+  | 'thumbnail.root'
+  | 'thumbnail.dir'
+  | 'thumbnail.base'
+  | 'thumbnail.ext'
+  | 'thumbnail.name'
+  | 'thumbnail.relativeDirectory'
+  | 'thumbnail.dev'
+  | 'thumbnail.mode'
+  | 'thumbnail.nlink'
+  | 'thumbnail.uid'
+  | 'thumbnail.gid'
+  | 'thumbnail.rdev'
+  | 'thumbnail.ino'
+  | 'thumbnail.atimeMs'
+  | 'thumbnail.mtimeMs'
+  | 'thumbnail.ctimeMs'
+  | 'thumbnail.atime'
+  | 'thumbnail.mtime'
+  | 'thumbnail.ctime'
+  | 'thumbnail.birthtime'
+  | 'thumbnail.birthtimeMs'
+  | 'thumbnail.blksize'
+  | 'thumbnail.blocks'
+  | 'thumbnail.url'
+  | 'thumbnail.publicURL'
+  | 'thumbnail.childrenImageSharp'
+  | 'thumbnail.childrenImageSharp.fixed.base64'
+  | 'thumbnail.childrenImageSharp.fixed.tracedSVG'
+  | 'thumbnail.childrenImageSharp.fixed.aspectRatio'
+  | 'thumbnail.childrenImageSharp.fixed.width'
+  | 'thumbnail.childrenImageSharp.fixed.height'
+  | 'thumbnail.childrenImageSharp.fixed.src'
+  | 'thumbnail.childrenImageSharp.fixed.srcSet'
+  | 'thumbnail.childrenImageSharp.fixed.srcWebp'
+  | 'thumbnail.childrenImageSharp.fixed.srcSetWebp'
+  | 'thumbnail.childrenImageSharp.fixed.originalName'
+  | 'thumbnail.childrenImageSharp.fluid.base64'
+  | 'thumbnail.childrenImageSharp.fluid.tracedSVG'
+  | 'thumbnail.childrenImageSharp.fluid.aspectRatio'
+  | 'thumbnail.childrenImageSharp.fluid.src'
+  | 'thumbnail.childrenImageSharp.fluid.srcSet'
+  | 'thumbnail.childrenImageSharp.fluid.srcWebp'
+  | 'thumbnail.childrenImageSharp.fluid.srcSetWebp'
+  | 'thumbnail.childrenImageSharp.fluid.sizes'
+  | 'thumbnail.childrenImageSharp.fluid.originalImg'
+  | 'thumbnail.childrenImageSharp.fluid.originalName'
+  | 'thumbnail.childrenImageSharp.fluid.presentationWidth'
+  | 'thumbnail.childrenImageSharp.fluid.presentationHeight'
+  | 'thumbnail.childrenImageSharp.gatsbyImageData'
+  | 'thumbnail.childrenImageSharp.original.width'
+  | 'thumbnail.childrenImageSharp.original.height'
+  | 'thumbnail.childrenImageSharp.original.src'
+  | 'thumbnail.childrenImageSharp.resize.src'
+  | 'thumbnail.childrenImageSharp.resize.tracedSVG'
+  | 'thumbnail.childrenImageSharp.resize.width'
+  | 'thumbnail.childrenImageSharp.resize.height'
+  | 'thumbnail.childrenImageSharp.resize.aspectRatio'
+  | 'thumbnail.childrenImageSharp.resize.originalName'
+  | 'thumbnail.childrenImageSharp.id'
+  | 'thumbnail.childrenImageSharp.parent.id'
+  | 'thumbnail.childrenImageSharp.parent.children'
+  | 'thumbnail.childrenImageSharp.children'
+  | 'thumbnail.childrenImageSharp.children.id'
+  | 'thumbnail.childrenImageSharp.children.children'
+  | 'thumbnail.childrenImageSharp.internal.content'
+  | 'thumbnail.childrenImageSharp.internal.contentDigest'
+  | 'thumbnail.childrenImageSharp.internal.description'
+  | 'thumbnail.childrenImageSharp.internal.fieldOwners'
+  | 'thumbnail.childrenImageSharp.internal.ignoreType'
+  | 'thumbnail.childrenImageSharp.internal.mediaType'
+  | 'thumbnail.childrenImageSharp.internal.owner'
+  | 'thumbnail.childrenImageSharp.internal.type'
+  | 'thumbnail.childImageSharp.fixed.base64'
+  | 'thumbnail.childImageSharp.fixed.tracedSVG'
+  | 'thumbnail.childImageSharp.fixed.aspectRatio'
+  | 'thumbnail.childImageSharp.fixed.width'
+  | 'thumbnail.childImageSharp.fixed.height'
+  | 'thumbnail.childImageSharp.fixed.src'
+  | 'thumbnail.childImageSharp.fixed.srcSet'
+  | 'thumbnail.childImageSharp.fixed.srcWebp'
+  | 'thumbnail.childImageSharp.fixed.srcSetWebp'
+  | 'thumbnail.childImageSharp.fixed.originalName'
+  | 'thumbnail.childImageSharp.fluid.base64'
+  | 'thumbnail.childImageSharp.fluid.tracedSVG'
+  | 'thumbnail.childImageSharp.fluid.aspectRatio'
+  | 'thumbnail.childImageSharp.fluid.src'
+  | 'thumbnail.childImageSharp.fluid.srcSet'
+  | 'thumbnail.childImageSharp.fluid.srcWebp'
+  | 'thumbnail.childImageSharp.fluid.srcSetWebp'
+  | 'thumbnail.childImageSharp.fluid.sizes'
+  | 'thumbnail.childImageSharp.fluid.originalImg'
+  | 'thumbnail.childImageSharp.fluid.originalName'
+  | 'thumbnail.childImageSharp.fluid.presentationWidth'
+  | 'thumbnail.childImageSharp.fluid.presentationHeight'
+  | 'thumbnail.childImageSharp.gatsbyImageData'
+  | 'thumbnail.childImageSharp.original.width'
+  | 'thumbnail.childImageSharp.original.height'
+  | 'thumbnail.childImageSharp.original.src'
+  | 'thumbnail.childImageSharp.resize.src'
+  | 'thumbnail.childImageSharp.resize.tracedSVG'
+  | 'thumbnail.childImageSharp.resize.width'
+  | 'thumbnail.childImageSharp.resize.height'
+  | 'thumbnail.childImageSharp.resize.aspectRatio'
+  | 'thumbnail.childImageSharp.resize.originalName'
+  | 'thumbnail.childImageSharp.id'
+  | 'thumbnail.childImageSharp.parent.id'
+  | 'thumbnail.childImageSharp.parent.children'
+  | 'thumbnail.childImageSharp.children'
+  | 'thumbnail.childImageSharp.children.id'
+  | 'thumbnail.childImageSharp.children.children'
+  | 'thumbnail.childImageSharp.internal.content'
+  | 'thumbnail.childImageSharp.internal.contentDigest'
+  | 'thumbnail.childImageSharp.internal.description'
+  | 'thumbnail.childImageSharp.internal.fieldOwners'
+  | 'thumbnail.childImageSharp.internal.ignoreType'
+  | 'thumbnail.childImageSharp.internal.mediaType'
+  | 'thumbnail.childImageSharp.internal.owner'
+  | 'thumbnail.childImageSharp.internal.type'
+  | 'thumbnail.id'
+  | 'thumbnail.parent.id'
+  | 'thumbnail.parent.parent.id'
+  | 'thumbnail.parent.parent.children'
+  | 'thumbnail.parent.children'
+  | 'thumbnail.parent.children.id'
+  | 'thumbnail.parent.children.children'
+  | 'thumbnail.parent.internal.content'
+  | 'thumbnail.parent.internal.contentDigest'
+  | 'thumbnail.parent.internal.description'
+  | 'thumbnail.parent.internal.fieldOwners'
+  | 'thumbnail.parent.internal.ignoreType'
+  | 'thumbnail.parent.internal.mediaType'
+  | 'thumbnail.parent.internal.owner'
+  | 'thumbnail.parent.internal.type'
+  | 'thumbnail.children'
+  | 'thumbnail.children.id'
+  | 'thumbnail.children.parent.id'
+  | 'thumbnail.children.parent.children'
+  | 'thumbnail.children.children'
+  | 'thumbnail.children.children.id'
+  | 'thumbnail.children.children.children'
+  | 'thumbnail.children.internal.content'
+  | 'thumbnail.children.internal.contentDigest'
+  | 'thumbnail.children.internal.description'
+  | 'thumbnail.children.internal.fieldOwners'
+  | 'thumbnail.children.internal.ignoreType'
+  | 'thumbnail.children.internal.mediaType'
+  | 'thumbnail.children.internal.owner'
+  | 'thumbnail.children.internal.type'
+  | 'thumbnail.internal.content'
+  | 'thumbnail.internal.contentDigest'
+  | 'thumbnail.internal.description'
+  | 'thumbnail.internal.fieldOwners'
+  | 'thumbnail.internal.ignoreType'
+  | 'thumbnail.internal.mediaType'
+  | 'thumbnail.internal.owner'
+  | 'thumbnail.internal.type'
+  | 'socialProfile.url'
+  | 'socialProfile.email'
+  | 'socialProfile.github'
+  | 'socialProfile.facebook'
+  | 'socialProfile.twitter'
+  | 'posts'
+  | 'posts.velogId'
+  | 'posts.velogUrl'
+  | 'posts.slug'
+  | 'posts.title'
+  | 'posts.rawContent'
+  | 'posts.shortDescription'
+  | 'posts.thumbnail'
+  | 'posts.publishedAt'
+  | 'posts.updatedAt'
+  | 'posts.author.velogId'
+  | 'posts.author.velogUrl'
+  | 'posts.author.username'
+  | 'posts.author.displayName'
+  | 'posts.author.bio'
+  | 'posts.author.aboutHtml'
+  | 'posts.author.isCertified'
+  | 'posts.author.thumbnail.sourceInstanceName'
+  | 'posts.author.thumbnail.absolutePath'
+  | 'posts.author.thumbnail.relativePath'
+  | 'posts.author.thumbnail.extension'
+  | 'posts.author.thumbnail.size'
+  | 'posts.author.thumbnail.prettySize'
+  | 'posts.author.thumbnail.modifiedTime'
+  | 'posts.author.thumbnail.accessTime'
+  | 'posts.author.thumbnail.changeTime'
+  | 'posts.author.thumbnail.birthTime'
+  | 'posts.author.thumbnail.root'
+  | 'posts.author.thumbnail.dir'
+  | 'posts.author.thumbnail.base'
+  | 'posts.author.thumbnail.ext'
+  | 'posts.author.thumbnail.name'
+  | 'posts.author.thumbnail.relativeDirectory'
+  | 'posts.author.thumbnail.dev'
+  | 'posts.author.thumbnail.mode'
+  | 'posts.author.thumbnail.nlink'
+  | 'posts.author.thumbnail.uid'
+  | 'posts.author.thumbnail.gid'
+  | 'posts.author.thumbnail.rdev'
+  | 'posts.author.thumbnail.ino'
+  | 'posts.author.thumbnail.atimeMs'
+  | 'posts.author.thumbnail.mtimeMs'
+  | 'posts.author.thumbnail.ctimeMs'
+  | 'posts.author.thumbnail.atime'
+  | 'posts.author.thumbnail.mtime'
+  | 'posts.author.thumbnail.ctime'
+  | 'posts.author.thumbnail.birthtime'
+  | 'posts.author.thumbnail.birthtimeMs'
+  | 'posts.author.thumbnail.blksize'
+  | 'posts.author.thumbnail.blocks'
+  | 'posts.author.thumbnail.url'
+  | 'posts.author.thumbnail.publicURL'
+  | 'posts.author.thumbnail.childrenImageSharp'
+  | 'posts.author.thumbnail.id'
+  | 'posts.author.thumbnail.children'
+  | 'posts.author.socialProfile.url'
+  | 'posts.author.socialProfile.email'
+  | 'posts.author.socialProfile.github'
+  | 'posts.author.socialProfile.facebook'
+  | 'posts.author.socialProfile.twitter'
+  | 'posts.author.posts'
+  | 'posts.author.posts.velogId'
+  | 'posts.author.posts.velogUrl'
+  | 'posts.author.posts.slug'
+  | 'posts.author.posts.title'
+  | 'posts.author.posts.rawContent'
+  | 'posts.author.posts.shortDescription'
+  | 'posts.author.posts.thumbnail'
+  | 'posts.author.posts.publishedAt'
+  | 'posts.author.posts.updatedAt'
+  | 'posts.author.posts.tags'
+  | 'posts.author.posts.id'
+  | 'posts.author.posts.children'
+  | 'posts.author.id'
+  | 'posts.author.parent.id'
+  | 'posts.author.parent.children'
+  | 'posts.author.children'
+  | 'posts.author.children.id'
+  | 'posts.author.children.children'
+  | 'posts.author.internal.content'
+  | 'posts.author.internal.contentDigest'
+  | 'posts.author.internal.description'
+  | 'posts.author.internal.fieldOwners'
+  | 'posts.author.internal.ignoreType'
+  | 'posts.author.internal.mediaType'
+  | 'posts.author.internal.owner'
+  | 'posts.author.internal.type'
+  | 'posts.tags'
+  | 'posts.tags.velogId'
+  | 'posts.tags.velogUrl'
+  | 'posts.tags.owner.velogId'
+  | 'posts.tags.owner.velogUrl'
+  | 'posts.tags.owner.username'
+  | 'posts.tags.owner.displayName'
+  | 'posts.tags.owner.bio'
+  | 'posts.tags.owner.aboutHtml'
+  | 'posts.tags.owner.isCertified'
+  | 'posts.tags.owner.posts'
+  | 'posts.tags.owner.id'
+  | 'posts.tags.owner.children'
+  | 'posts.tags.name'
+  | 'posts.tags.description'
+  | 'posts.tags.thumbnail.sourceInstanceName'
+  | 'posts.tags.thumbnail.absolutePath'
+  | 'posts.tags.thumbnail.relativePath'
+  | 'posts.tags.thumbnail.extension'
+  | 'posts.tags.thumbnail.size'
+  | 'posts.tags.thumbnail.prettySize'
+  | 'posts.tags.thumbnail.modifiedTime'
+  | 'posts.tags.thumbnail.accessTime'
+  | 'posts.tags.thumbnail.changeTime'
+  | 'posts.tags.thumbnail.birthTime'
+  | 'posts.tags.thumbnail.root'
+  | 'posts.tags.thumbnail.dir'
+  | 'posts.tags.thumbnail.base'
+  | 'posts.tags.thumbnail.ext'
+  | 'posts.tags.thumbnail.name'
+  | 'posts.tags.thumbnail.relativeDirectory'
+  | 'posts.tags.thumbnail.dev'
+  | 'posts.tags.thumbnail.mode'
+  | 'posts.tags.thumbnail.nlink'
+  | 'posts.tags.thumbnail.uid'
+  | 'posts.tags.thumbnail.gid'
+  | 'posts.tags.thumbnail.rdev'
+  | 'posts.tags.thumbnail.ino'
+  | 'posts.tags.thumbnail.atimeMs'
+  | 'posts.tags.thumbnail.mtimeMs'
+  | 'posts.tags.thumbnail.ctimeMs'
+  | 'posts.tags.thumbnail.atime'
+  | 'posts.tags.thumbnail.mtime'
+  | 'posts.tags.thumbnail.ctime'
+  | 'posts.tags.thumbnail.birthtime'
+  | 'posts.tags.thumbnail.birthtimeMs'
+  | 'posts.tags.thumbnail.blksize'
+  | 'posts.tags.thumbnail.blocks'
+  | 'posts.tags.thumbnail.url'
+  | 'posts.tags.thumbnail.publicURL'
+  | 'posts.tags.thumbnail.childrenImageSharp'
+  | 'posts.tags.thumbnail.id'
+  | 'posts.tags.thumbnail.children'
+  | 'posts.tags.posts'
+  | 'posts.tags.posts.velogId'
+  | 'posts.tags.posts.velogUrl'
+  | 'posts.tags.posts.slug'
+  | 'posts.tags.posts.title'
+  | 'posts.tags.posts.rawContent'
+  | 'posts.tags.posts.shortDescription'
+  | 'posts.tags.posts.thumbnail'
+  | 'posts.tags.posts.publishedAt'
+  | 'posts.tags.posts.updatedAt'
+  | 'posts.tags.posts.tags'
+  | 'posts.tags.posts.id'
+  | 'posts.tags.posts.children'
+  | 'posts.tags.id'
+  | 'posts.tags.parent.id'
+  | 'posts.tags.parent.children'
+  | 'posts.tags.children'
+  | 'posts.tags.children.id'
+  | 'posts.tags.children.children'
+  | 'posts.tags.internal.content'
+  | 'posts.tags.internal.contentDigest'
+  | 'posts.tags.internal.description'
+  | 'posts.tags.internal.fieldOwners'
+  | 'posts.tags.internal.ignoreType'
+  | 'posts.tags.internal.mediaType'
+  | 'posts.tags.internal.owner'
+  | 'posts.tags.internal.type'
+  | 'posts.series.index'
+  | 'posts.series.node.velogId'
+  | 'posts.series.node.velogUrl'
+  | 'posts.series.node.name'
+  | 'posts.series.node.description'
+  | 'posts.series.node.slug'
+  | 'posts.series.node.posts'
+  | 'posts.series.node.id'
+  | 'posts.series.node.children'
+  | 'posts.id'
+  | 'posts.parent.id'
+  | 'posts.parent.parent.id'
+  | 'posts.parent.parent.children'
+  | 'posts.parent.children'
+  | 'posts.parent.children.id'
+  | 'posts.parent.children.children'
+  | 'posts.parent.internal.content'
+  | 'posts.parent.internal.contentDigest'
+  | 'posts.parent.internal.description'
+  | 'posts.parent.internal.fieldOwners'
+  | 'posts.parent.internal.ignoreType'
+  | 'posts.parent.internal.mediaType'
+  | 'posts.parent.internal.owner'
+  | 'posts.parent.internal.type'
+  | 'posts.children'
+  | 'posts.children.id'
+  | 'posts.children.parent.id'
+  | 'posts.children.parent.children'
+  | 'posts.children.children'
+  | 'posts.children.children.id'
+  | 'posts.children.children.children'
+  | 'posts.children.internal.content'
+  | 'posts.children.internal.contentDigest'
+  | 'posts.children.internal.description'
+  | 'posts.children.internal.fieldOwners'
+  | 'posts.children.internal.ignoreType'
+  | 'posts.children.internal.mediaType'
+  | 'posts.children.internal.owner'
+  | 'posts.children.internal.type'
+  | 'posts.internal.content'
+  | 'posts.internal.contentDigest'
+  | 'posts.internal.description'
+  | 'posts.internal.fieldOwners'
+  | 'posts.internal.ignoreType'
+  | 'posts.internal.mediaType'
+  | 'posts.internal.owner'
+  | 'posts.internal.type'
+  | 'id'
+  | 'parent.id'
+  | 'parent.parent.id'
+  | 'parent.parent.parent.id'
+  | 'parent.parent.parent.children'
+  | 'parent.parent.children'
+  | 'parent.parent.children.id'
+  | 'parent.parent.children.children'
+  | 'parent.parent.internal.content'
+  | 'parent.parent.internal.contentDigest'
+  | 'parent.parent.internal.description'
+  | 'parent.parent.internal.fieldOwners'
+  | 'parent.parent.internal.ignoreType'
+  | 'parent.parent.internal.mediaType'
+  | 'parent.parent.internal.owner'
+  | 'parent.parent.internal.type'
+  | 'parent.children'
+  | 'parent.children.id'
+  | 'parent.children.parent.id'
+  | 'parent.children.parent.children'
+  | 'parent.children.children'
+  | 'parent.children.children.id'
+  | 'parent.children.children.children'
+  | 'parent.children.internal.content'
+  | 'parent.children.internal.contentDigest'
+  | 'parent.children.internal.description'
+  | 'parent.children.internal.fieldOwners'
+  | 'parent.children.internal.ignoreType'
+  | 'parent.children.internal.mediaType'
+  | 'parent.children.internal.owner'
+  | 'parent.children.internal.type'
+  | 'parent.internal.content'
+  | 'parent.internal.contentDigest'
+  | 'parent.internal.description'
+  | 'parent.internal.fieldOwners'
+  | 'parent.internal.ignoreType'
+  | 'parent.internal.mediaType'
+  | 'parent.internal.owner'
+  | 'parent.internal.type'
+  | 'children'
+  | 'children.id'
+  | 'children.parent.id'
+  | 'children.parent.parent.id'
+  | 'children.parent.parent.children'
+  | 'children.parent.children'
+  | 'children.parent.children.id'
+  | 'children.parent.children.children'
+  | 'children.parent.internal.content'
+  | 'children.parent.internal.contentDigest'
+  | 'children.parent.internal.description'
+  | 'children.parent.internal.fieldOwners'
+  | 'children.parent.internal.ignoreType'
+  | 'children.parent.internal.mediaType'
+  | 'children.parent.internal.owner'
+  | 'children.parent.internal.type'
+  | 'children.children'
+  | 'children.children.id'
+  | 'children.children.parent.id'
+  | 'children.children.parent.children'
+  | 'children.children.children'
+  | 'children.children.children.id'
+  | 'children.children.children.children'
+  | 'children.children.internal.content'
+  | 'children.children.internal.contentDigest'
+  | 'children.children.internal.description'
+  | 'children.children.internal.fieldOwners'
+  | 'children.children.internal.ignoreType'
+  | 'children.children.internal.mediaType'
+  | 'children.children.internal.owner'
+  | 'children.children.internal.type'
+  | 'children.internal.content'
+  | 'children.internal.contentDigest'
+  | 'children.internal.description'
+  | 'children.internal.fieldOwners'
+  | 'children.internal.ignoreType'
+  | 'children.internal.mediaType'
+  | 'children.internal.owner'
+  | 'children.internal.type'
+  | 'internal.content'
+  | 'internal.contentDigest'
+  | 'internal.description'
+  | 'internal.fieldOwners'
+  | 'internal.ignoreType'
+  | 'internal.mediaType'
+  | 'internal.owner'
+  | 'internal.type';
+
+type VelogUserGroupConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<VelogUserEdge>;
+  readonly nodes: ReadonlyArray<VelogUser>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly max: Maybe<Scalars['Float']>;
+  readonly min: Maybe<Scalars['Float']>;
+  readonly sum: Maybe<Scalars['Float']>;
+  readonly group: ReadonlyArray<VelogUserGroupConnection>;
+  readonly field: Scalars['String'];
+  readonly fieldValue: Maybe<Scalars['String']>;
+};
+
+
+type VelogUserGroupConnection_distinctArgs = {
+  field: VelogUserFieldsEnum;
+};
+
+
+type VelogUserGroupConnection_maxArgs = {
+  field: VelogUserFieldsEnum;
+};
+
+
+type VelogUserGroupConnection_minArgs = {
+  field: VelogUserFieldsEnum;
+};
+
+
+type VelogUserGroupConnection_sumArgs = {
+  field: VelogUserFieldsEnum;
+};
+
+
+type VelogUserGroupConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: VelogUserFieldsEnum;
+};
+
+type VelogUserSortInput = {
+  readonly fields: Maybe<ReadonlyArray<Maybe<VelogUserFieldsEnum>>>;
+  readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
+};
+
+type VelogTagConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<VelogTagEdge>;
+  readonly nodes: ReadonlyArray<VelogTag>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly max: Maybe<Scalars['Float']>;
+  readonly min: Maybe<Scalars['Float']>;
+  readonly sum: Maybe<Scalars['Float']>;
+  readonly group: ReadonlyArray<VelogTagGroupConnection>;
+};
+
+
+type VelogTagConnection_distinctArgs = {
+  field: VelogTagFieldsEnum;
+};
+
+
+type VelogTagConnection_maxArgs = {
+  field: VelogTagFieldsEnum;
+};
+
+
+type VelogTagConnection_minArgs = {
+  field: VelogTagFieldsEnum;
+};
+
+
+type VelogTagConnection_sumArgs = {
+  field: VelogTagFieldsEnum;
+};
+
+
+type VelogTagConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: VelogTagFieldsEnum;
+};
+
+type VelogTagEdge = {
+  readonly next: Maybe<VelogTag>;
+  readonly node: VelogTag;
+  readonly previous: Maybe<VelogTag>;
+};
+
+type VelogTagFieldsEnum =
+  | 'velogId'
+  | 'velogUrl'
+  | 'owner.velogId'
+  | 'owner.velogUrl'
+  | 'owner.username'
+  | 'owner.displayName'
+  | 'owner.bio'
+  | 'owner.aboutHtml'
+  | 'owner.isCertified'
+  | 'owner.thumbnail.sourceInstanceName'
+  | 'owner.thumbnail.absolutePath'
+  | 'owner.thumbnail.relativePath'
+  | 'owner.thumbnail.extension'
+  | 'owner.thumbnail.size'
+  | 'owner.thumbnail.prettySize'
+  | 'owner.thumbnail.modifiedTime'
+  | 'owner.thumbnail.accessTime'
+  | 'owner.thumbnail.changeTime'
+  | 'owner.thumbnail.birthTime'
+  | 'owner.thumbnail.root'
+  | 'owner.thumbnail.dir'
+  | 'owner.thumbnail.base'
+  | 'owner.thumbnail.ext'
+  | 'owner.thumbnail.name'
+  | 'owner.thumbnail.relativeDirectory'
+  | 'owner.thumbnail.dev'
+  | 'owner.thumbnail.mode'
+  | 'owner.thumbnail.nlink'
+  | 'owner.thumbnail.uid'
+  | 'owner.thumbnail.gid'
+  | 'owner.thumbnail.rdev'
+  | 'owner.thumbnail.ino'
+  | 'owner.thumbnail.atimeMs'
+  | 'owner.thumbnail.mtimeMs'
+  | 'owner.thumbnail.ctimeMs'
+  | 'owner.thumbnail.atime'
+  | 'owner.thumbnail.mtime'
+  | 'owner.thumbnail.ctime'
+  | 'owner.thumbnail.birthtime'
+  | 'owner.thumbnail.birthtimeMs'
+  | 'owner.thumbnail.blksize'
+  | 'owner.thumbnail.blocks'
+  | 'owner.thumbnail.url'
+  | 'owner.thumbnail.publicURL'
+  | 'owner.thumbnail.childrenImageSharp'
+  | 'owner.thumbnail.childrenImageSharp.gatsbyImageData'
+  | 'owner.thumbnail.childrenImageSharp.id'
+  | 'owner.thumbnail.childrenImageSharp.children'
+  | 'owner.thumbnail.childImageSharp.gatsbyImageData'
+  | 'owner.thumbnail.childImageSharp.id'
+  | 'owner.thumbnail.childImageSharp.children'
+  | 'owner.thumbnail.id'
+  | 'owner.thumbnail.parent.id'
+  | 'owner.thumbnail.parent.children'
+  | 'owner.thumbnail.children'
+  | 'owner.thumbnail.children.id'
+  | 'owner.thumbnail.children.children'
+  | 'owner.thumbnail.internal.content'
+  | 'owner.thumbnail.internal.contentDigest'
+  | 'owner.thumbnail.internal.description'
+  | 'owner.thumbnail.internal.fieldOwners'
+  | 'owner.thumbnail.internal.ignoreType'
+  | 'owner.thumbnail.internal.mediaType'
+  | 'owner.thumbnail.internal.owner'
+  | 'owner.thumbnail.internal.type'
+  | 'owner.socialProfile.url'
+  | 'owner.socialProfile.email'
+  | 'owner.socialProfile.github'
+  | 'owner.socialProfile.facebook'
+  | 'owner.socialProfile.twitter'
+  | 'owner.posts'
+  | 'owner.posts.velogId'
+  | 'owner.posts.velogUrl'
+  | 'owner.posts.slug'
+  | 'owner.posts.title'
+  | 'owner.posts.rawContent'
+  | 'owner.posts.shortDescription'
+  | 'owner.posts.thumbnail'
+  | 'owner.posts.publishedAt'
+  | 'owner.posts.updatedAt'
+  | 'owner.posts.author.velogId'
+  | 'owner.posts.author.velogUrl'
+  | 'owner.posts.author.username'
+  | 'owner.posts.author.displayName'
+  | 'owner.posts.author.bio'
+  | 'owner.posts.author.aboutHtml'
+  | 'owner.posts.author.isCertified'
+  | 'owner.posts.author.posts'
+  | 'owner.posts.author.id'
+  | 'owner.posts.author.children'
+  | 'owner.posts.tags'
+  | 'owner.posts.tags.velogId'
+  | 'owner.posts.tags.velogUrl'
+  | 'owner.posts.tags.name'
+  | 'owner.posts.tags.description'
+  | 'owner.posts.tags.posts'
+  | 'owner.posts.tags.id'
+  | 'owner.posts.tags.children'
+  | 'owner.posts.series.index'
+  | 'owner.posts.id'
+  | 'owner.posts.parent.id'
+  | 'owner.posts.parent.children'
+  | 'owner.posts.children'
+  | 'owner.posts.children.id'
+  | 'owner.posts.children.children'
+  | 'owner.posts.internal.content'
+  | 'owner.posts.internal.contentDigest'
+  | 'owner.posts.internal.description'
+  | 'owner.posts.internal.fieldOwners'
+  | 'owner.posts.internal.ignoreType'
+  | 'owner.posts.internal.mediaType'
+  | 'owner.posts.internal.owner'
+  | 'owner.posts.internal.type'
+  | 'owner.id'
+  | 'owner.parent.id'
+  | 'owner.parent.parent.id'
+  | 'owner.parent.parent.children'
+  | 'owner.parent.children'
+  | 'owner.parent.children.id'
+  | 'owner.parent.children.children'
+  | 'owner.parent.internal.content'
+  | 'owner.parent.internal.contentDigest'
+  | 'owner.parent.internal.description'
+  | 'owner.parent.internal.fieldOwners'
+  | 'owner.parent.internal.ignoreType'
+  | 'owner.parent.internal.mediaType'
+  | 'owner.parent.internal.owner'
+  | 'owner.parent.internal.type'
+  | 'owner.children'
+  | 'owner.children.id'
+  | 'owner.children.parent.id'
+  | 'owner.children.parent.children'
+  | 'owner.children.children'
+  | 'owner.children.children.id'
+  | 'owner.children.children.children'
+  | 'owner.children.internal.content'
+  | 'owner.children.internal.contentDigest'
+  | 'owner.children.internal.description'
+  | 'owner.children.internal.fieldOwners'
+  | 'owner.children.internal.ignoreType'
+  | 'owner.children.internal.mediaType'
+  | 'owner.children.internal.owner'
+  | 'owner.children.internal.type'
+  | 'owner.internal.content'
+  | 'owner.internal.contentDigest'
+  | 'owner.internal.description'
+  | 'owner.internal.fieldOwners'
+  | 'owner.internal.ignoreType'
+  | 'owner.internal.mediaType'
+  | 'owner.internal.owner'
+  | 'owner.internal.type'
+  | 'name'
+  | 'description'
+  | 'thumbnail.sourceInstanceName'
+  | 'thumbnail.absolutePath'
+  | 'thumbnail.relativePath'
+  | 'thumbnail.extension'
+  | 'thumbnail.size'
+  | 'thumbnail.prettySize'
+  | 'thumbnail.modifiedTime'
+  | 'thumbnail.accessTime'
+  | 'thumbnail.changeTime'
+  | 'thumbnail.birthTime'
+  | 'thumbnail.root'
+  | 'thumbnail.dir'
+  | 'thumbnail.base'
+  | 'thumbnail.ext'
+  | 'thumbnail.name'
+  | 'thumbnail.relativeDirectory'
+  | 'thumbnail.dev'
+  | 'thumbnail.mode'
+  | 'thumbnail.nlink'
+  | 'thumbnail.uid'
+  | 'thumbnail.gid'
+  | 'thumbnail.rdev'
+  | 'thumbnail.ino'
+  | 'thumbnail.atimeMs'
+  | 'thumbnail.mtimeMs'
+  | 'thumbnail.ctimeMs'
+  | 'thumbnail.atime'
+  | 'thumbnail.mtime'
+  | 'thumbnail.ctime'
+  | 'thumbnail.birthtime'
+  | 'thumbnail.birthtimeMs'
+  | 'thumbnail.blksize'
+  | 'thumbnail.blocks'
+  | 'thumbnail.url'
+  | 'thumbnail.publicURL'
+  | 'thumbnail.childrenImageSharp'
+  | 'thumbnail.childrenImageSharp.fixed.base64'
+  | 'thumbnail.childrenImageSharp.fixed.tracedSVG'
+  | 'thumbnail.childrenImageSharp.fixed.aspectRatio'
+  | 'thumbnail.childrenImageSharp.fixed.width'
+  | 'thumbnail.childrenImageSharp.fixed.height'
+  | 'thumbnail.childrenImageSharp.fixed.src'
+  | 'thumbnail.childrenImageSharp.fixed.srcSet'
+  | 'thumbnail.childrenImageSharp.fixed.srcWebp'
+  | 'thumbnail.childrenImageSharp.fixed.srcSetWebp'
+  | 'thumbnail.childrenImageSharp.fixed.originalName'
+  | 'thumbnail.childrenImageSharp.fluid.base64'
+  | 'thumbnail.childrenImageSharp.fluid.tracedSVG'
+  | 'thumbnail.childrenImageSharp.fluid.aspectRatio'
+  | 'thumbnail.childrenImageSharp.fluid.src'
+  | 'thumbnail.childrenImageSharp.fluid.srcSet'
+  | 'thumbnail.childrenImageSharp.fluid.srcWebp'
+  | 'thumbnail.childrenImageSharp.fluid.srcSetWebp'
+  | 'thumbnail.childrenImageSharp.fluid.sizes'
+  | 'thumbnail.childrenImageSharp.fluid.originalImg'
+  | 'thumbnail.childrenImageSharp.fluid.originalName'
+  | 'thumbnail.childrenImageSharp.fluid.presentationWidth'
+  | 'thumbnail.childrenImageSharp.fluid.presentationHeight'
+  | 'thumbnail.childrenImageSharp.gatsbyImageData'
+  | 'thumbnail.childrenImageSharp.original.width'
+  | 'thumbnail.childrenImageSharp.original.height'
+  | 'thumbnail.childrenImageSharp.original.src'
+  | 'thumbnail.childrenImageSharp.resize.src'
+  | 'thumbnail.childrenImageSharp.resize.tracedSVG'
+  | 'thumbnail.childrenImageSharp.resize.width'
+  | 'thumbnail.childrenImageSharp.resize.height'
+  | 'thumbnail.childrenImageSharp.resize.aspectRatio'
+  | 'thumbnail.childrenImageSharp.resize.originalName'
+  | 'thumbnail.childrenImageSharp.id'
+  | 'thumbnail.childrenImageSharp.parent.id'
+  | 'thumbnail.childrenImageSharp.parent.children'
+  | 'thumbnail.childrenImageSharp.children'
+  | 'thumbnail.childrenImageSharp.children.id'
+  | 'thumbnail.childrenImageSharp.children.children'
+  | 'thumbnail.childrenImageSharp.internal.content'
+  | 'thumbnail.childrenImageSharp.internal.contentDigest'
+  | 'thumbnail.childrenImageSharp.internal.description'
+  | 'thumbnail.childrenImageSharp.internal.fieldOwners'
+  | 'thumbnail.childrenImageSharp.internal.ignoreType'
+  | 'thumbnail.childrenImageSharp.internal.mediaType'
+  | 'thumbnail.childrenImageSharp.internal.owner'
+  | 'thumbnail.childrenImageSharp.internal.type'
+  | 'thumbnail.childImageSharp.fixed.base64'
+  | 'thumbnail.childImageSharp.fixed.tracedSVG'
+  | 'thumbnail.childImageSharp.fixed.aspectRatio'
+  | 'thumbnail.childImageSharp.fixed.width'
+  | 'thumbnail.childImageSharp.fixed.height'
+  | 'thumbnail.childImageSharp.fixed.src'
+  | 'thumbnail.childImageSharp.fixed.srcSet'
+  | 'thumbnail.childImageSharp.fixed.srcWebp'
+  | 'thumbnail.childImageSharp.fixed.srcSetWebp'
+  | 'thumbnail.childImageSharp.fixed.originalName'
+  | 'thumbnail.childImageSharp.fluid.base64'
+  | 'thumbnail.childImageSharp.fluid.tracedSVG'
+  | 'thumbnail.childImageSharp.fluid.aspectRatio'
+  | 'thumbnail.childImageSharp.fluid.src'
+  | 'thumbnail.childImageSharp.fluid.srcSet'
+  | 'thumbnail.childImageSharp.fluid.srcWebp'
+  | 'thumbnail.childImageSharp.fluid.srcSetWebp'
+  | 'thumbnail.childImageSharp.fluid.sizes'
+  | 'thumbnail.childImageSharp.fluid.originalImg'
+  | 'thumbnail.childImageSharp.fluid.originalName'
+  | 'thumbnail.childImageSharp.fluid.presentationWidth'
+  | 'thumbnail.childImageSharp.fluid.presentationHeight'
+  | 'thumbnail.childImageSharp.gatsbyImageData'
+  | 'thumbnail.childImageSharp.original.width'
+  | 'thumbnail.childImageSharp.original.height'
+  | 'thumbnail.childImageSharp.original.src'
+  | 'thumbnail.childImageSharp.resize.src'
+  | 'thumbnail.childImageSharp.resize.tracedSVG'
+  | 'thumbnail.childImageSharp.resize.width'
+  | 'thumbnail.childImageSharp.resize.height'
+  | 'thumbnail.childImageSharp.resize.aspectRatio'
+  | 'thumbnail.childImageSharp.resize.originalName'
+  | 'thumbnail.childImageSharp.id'
+  | 'thumbnail.childImageSharp.parent.id'
+  | 'thumbnail.childImageSharp.parent.children'
+  | 'thumbnail.childImageSharp.children'
+  | 'thumbnail.childImageSharp.children.id'
+  | 'thumbnail.childImageSharp.children.children'
+  | 'thumbnail.childImageSharp.internal.content'
+  | 'thumbnail.childImageSharp.internal.contentDigest'
+  | 'thumbnail.childImageSharp.internal.description'
+  | 'thumbnail.childImageSharp.internal.fieldOwners'
+  | 'thumbnail.childImageSharp.internal.ignoreType'
+  | 'thumbnail.childImageSharp.internal.mediaType'
+  | 'thumbnail.childImageSharp.internal.owner'
+  | 'thumbnail.childImageSharp.internal.type'
+  | 'thumbnail.id'
+  | 'thumbnail.parent.id'
+  | 'thumbnail.parent.parent.id'
+  | 'thumbnail.parent.parent.children'
+  | 'thumbnail.parent.children'
+  | 'thumbnail.parent.children.id'
+  | 'thumbnail.parent.children.children'
+  | 'thumbnail.parent.internal.content'
+  | 'thumbnail.parent.internal.contentDigest'
+  | 'thumbnail.parent.internal.description'
+  | 'thumbnail.parent.internal.fieldOwners'
+  | 'thumbnail.parent.internal.ignoreType'
+  | 'thumbnail.parent.internal.mediaType'
+  | 'thumbnail.parent.internal.owner'
+  | 'thumbnail.parent.internal.type'
+  | 'thumbnail.children'
+  | 'thumbnail.children.id'
+  | 'thumbnail.children.parent.id'
+  | 'thumbnail.children.parent.children'
+  | 'thumbnail.children.children'
+  | 'thumbnail.children.children.id'
+  | 'thumbnail.children.children.children'
+  | 'thumbnail.children.internal.content'
+  | 'thumbnail.children.internal.contentDigest'
+  | 'thumbnail.children.internal.description'
+  | 'thumbnail.children.internal.fieldOwners'
+  | 'thumbnail.children.internal.ignoreType'
+  | 'thumbnail.children.internal.mediaType'
+  | 'thumbnail.children.internal.owner'
+  | 'thumbnail.children.internal.type'
+  | 'thumbnail.internal.content'
+  | 'thumbnail.internal.contentDigest'
+  | 'thumbnail.internal.description'
+  | 'thumbnail.internal.fieldOwners'
+  | 'thumbnail.internal.ignoreType'
+  | 'thumbnail.internal.mediaType'
+  | 'thumbnail.internal.owner'
+  | 'thumbnail.internal.type'
+  | 'posts'
+  | 'posts.velogId'
+  | 'posts.velogUrl'
+  | 'posts.slug'
+  | 'posts.title'
+  | 'posts.rawContent'
+  | 'posts.shortDescription'
+  | 'posts.thumbnail'
+  | 'posts.publishedAt'
+  | 'posts.updatedAt'
+  | 'posts.author.velogId'
+  | 'posts.author.velogUrl'
+  | 'posts.author.username'
+  | 'posts.author.displayName'
+  | 'posts.author.bio'
+  | 'posts.author.aboutHtml'
+  | 'posts.author.isCertified'
+  | 'posts.author.thumbnail.sourceInstanceName'
+  | 'posts.author.thumbnail.absolutePath'
+  | 'posts.author.thumbnail.relativePath'
+  | 'posts.author.thumbnail.extension'
+  | 'posts.author.thumbnail.size'
+  | 'posts.author.thumbnail.prettySize'
+  | 'posts.author.thumbnail.modifiedTime'
+  | 'posts.author.thumbnail.accessTime'
+  | 'posts.author.thumbnail.changeTime'
+  | 'posts.author.thumbnail.birthTime'
+  | 'posts.author.thumbnail.root'
+  | 'posts.author.thumbnail.dir'
+  | 'posts.author.thumbnail.base'
+  | 'posts.author.thumbnail.ext'
+  | 'posts.author.thumbnail.name'
+  | 'posts.author.thumbnail.relativeDirectory'
+  | 'posts.author.thumbnail.dev'
+  | 'posts.author.thumbnail.mode'
+  | 'posts.author.thumbnail.nlink'
+  | 'posts.author.thumbnail.uid'
+  | 'posts.author.thumbnail.gid'
+  | 'posts.author.thumbnail.rdev'
+  | 'posts.author.thumbnail.ino'
+  | 'posts.author.thumbnail.atimeMs'
+  | 'posts.author.thumbnail.mtimeMs'
+  | 'posts.author.thumbnail.ctimeMs'
+  | 'posts.author.thumbnail.atime'
+  | 'posts.author.thumbnail.mtime'
+  | 'posts.author.thumbnail.ctime'
+  | 'posts.author.thumbnail.birthtime'
+  | 'posts.author.thumbnail.birthtimeMs'
+  | 'posts.author.thumbnail.blksize'
+  | 'posts.author.thumbnail.blocks'
+  | 'posts.author.thumbnail.url'
+  | 'posts.author.thumbnail.publicURL'
+  | 'posts.author.thumbnail.childrenImageSharp'
+  | 'posts.author.thumbnail.id'
+  | 'posts.author.thumbnail.children'
+  | 'posts.author.socialProfile.url'
+  | 'posts.author.socialProfile.email'
+  | 'posts.author.socialProfile.github'
+  | 'posts.author.socialProfile.facebook'
+  | 'posts.author.socialProfile.twitter'
+  | 'posts.author.posts'
+  | 'posts.author.posts.velogId'
+  | 'posts.author.posts.velogUrl'
+  | 'posts.author.posts.slug'
+  | 'posts.author.posts.title'
+  | 'posts.author.posts.rawContent'
+  | 'posts.author.posts.shortDescription'
+  | 'posts.author.posts.thumbnail'
+  | 'posts.author.posts.publishedAt'
+  | 'posts.author.posts.updatedAt'
+  | 'posts.author.posts.tags'
+  | 'posts.author.posts.id'
+  | 'posts.author.posts.children'
+  | 'posts.author.id'
+  | 'posts.author.parent.id'
+  | 'posts.author.parent.children'
+  | 'posts.author.children'
+  | 'posts.author.children.id'
+  | 'posts.author.children.children'
+  | 'posts.author.internal.content'
+  | 'posts.author.internal.contentDigest'
+  | 'posts.author.internal.description'
+  | 'posts.author.internal.fieldOwners'
+  | 'posts.author.internal.ignoreType'
+  | 'posts.author.internal.mediaType'
+  | 'posts.author.internal.owner'
+  | 'posts.author.internal.type'
+  | 'posts.tags'
+  | 'posts.tags.velogId'
+  | 'posts.tags.velogUrl'
+  | 'posts.tags.owner.velogId'
+  | 'posts.tags.owner.velogUrl'
+  | 'posts.tags.owner.username'
+  | 'posts.tags.owner.displayName'
+  | 'posts.tags.owner.bio'
+  | 'posts.tags.owner.aboutHtml'
+  | 'posts.tags.owner.isCertified'
+  | 'posts.tags.owner.posts'
+  | 'posts.tags.owner.id'
+  | 'posts.tags.owner.children'
+  | 'posts.tags.name'
+  | 'posts.tags.description'
+  | 'posts.tags.thumbnail.sourceInstanceName'
+  | 'posts.tags.thumbnail.absolutePath'
+  | 'posts.tags.thumbnail.relativePath'
+  | 'posts.tags.thumbnail.extension'
+  | 'posts.tags.thumbnail.size'
+  | 'posts.tags.thumbnail.prettySize'
+  | 'posts.tags.thumbnail.modifiedTime'
+  | 'posts.tags.thumbnail.accessTime'
+  | 'posts.tags.thumbnail.changeTime'
+  | 'posts.tags.thumbnail.birthTime'
+  | 'posts.tags.thumbnail.root'
+  | 'posts.tags.thumbnail.dir'
+  | 'posts.tags.thumbnail.base'
+  | 'posts.tags.thumbnail.ext'
+  | 'posts.tags.thumbnail.name'
+  | 'posts.tags.thumbnail.relativeDirectory'
+  | 'posts.tags.thumbnail.dev'
+  | 'posts.tags.thumbnail.mode'
+  | 'posts.tags.thumbnail.nlink'
+  | 'posts.tags.thumbnail.uid'
+  | 'posts.tags.thumbnail.gid'
+  | 'posts.tags.thumbnail.rdev'
+  | 'posts.tags.thumbnail.ino'
+  | 'posts.tags.thumbnail.atimeMs'
+  | 'posts.tags.thumbnail.mtimeMs'
+  | 'posts.tags.thumbnail.ctimeMs'
+  | 'posts.tags.thumbnail.atime'
+  | 'posts.tags.thumbnail.mtime'
+  | 'posts.tags.thumbnail.ctime'
+  | 'posts.tags.thumbnail.birthtime'
+  | 'posts.tags.thumbnail.birthtimeMs'
+  | 'posts.tags.thumbnail.blksize'
+  | 'posts.tags.thumbnail.blocks'
+  | 'posts.tags.thumbnail.url'
+  | 'posts.tags.thumbnail.publicURL'
+  | 'posts.tags.thumbnail.childrenImageSharp'
+  | 'posts.tags.thumbnail.id'
+  | 'posts.tags.thumbnail.children'
+  | 'posts.tags.posts'
+  | 'posts.tags.posts.velogId'
+  | 'posts.tags.posts.velogUrl'
+  | 'posts.tags.posts.slug'
+  | 'posts.tags.posts.title'
+  | 'posts.tags.posts.rawContent'
+  | 'posts.tags.posts.shortDescription'
+  | 'posts.tags.posts.thumbnail'
+  | 'posts.tags.posts.publishedAt'
+  | 'posts.tags.posts.updatedAt'
+  | 'posts.tags.posts.tags'
+  | 'posts.tags.posts.id'
+  | 'posts.tags.posts.children'
+  | 'posts.tags.id'
+  | 'posts.tags.parent.id'
+  | 'posts.tags.parent.children'
+  | 'posts.tags.children'
+  | 'posts.tags.children.id'
+  | 'posts.tags.children.children'
+  | 'posts.tags.internal.content'
+  | 'posts.tags.internal.contentDigest'
+  | 'posts.tags.internal.description'
+  | 'posts.tags.internal.fieldOwners'
+  | 'posts.tags.internal.ignoreType'
+  | 'posts.tags.internal.mediaType'
+  | 'posts.tags.internal.owner'
+  | 'posts.tags.internal.type'
+  | 'posts.series.index'
+  | 'posts.series.node.velogId'
+  | 'posts.series.node.velogUrl'
+  | 'posts.series.node.name'
+  | 'posts.series.node.description'
+  | 'posts.series.node.slug'
+  | 'posts.series.node.posts'
+  | 'posts.series.node.id'
+  | 'posts.series.node.children'
+  | 'posts.id'
+  | 'posts.parent.id'
+  | 'posts.parent.parent.id'
+  | 'posts.parent.parent.children'
+  | 'posts.parent.children'
+  | 'posts.parent.children.id'
+  | 'posts.parent.children.children'
+  | 'posts.parent.internal.content'
+  | 'posts.parent.internal.contentDigest'
+  | 'posts.parent.internal.description'
+  | 'posts.parent.internal.fieldOwners'
+  | 'posts.parent.internal.ignoreType'
+  | 'posts.parent.internal.mediaType'
+  | 'posts.parent.internal.owner'
+  | 'posts.parent.internal.type'
+  | 'posts.children'
+  | 'posts.children.id'
+  | 'posts.children.parent.id'
+  | 'posts.children.parent.children'
+  | 'posts.children.children'
+  | 'posts.children.children.id'
+  | 'posts.children.children.children'
+  | 'posts.children.internal.content'
+  | 'posts.children.internal.contentDigest'
+  | 'posts.children.internal.description'
+  | 'posts.children.internal.fieldOwners'
+  | 'posts.children.internal.ignoreType'
+  | 'posts.children.internal.mediaType'
+  | 'posts.children.internal.owner'
+  | 'posts.children.internal.type'
+  | 'posts.internal.content'
+  | 'posts.internal.contentDigest'
+  | 'posts.internal.description'
+  | 'posts.internal.fieldOwners'
+  | 'posts.internal.ignoreType'
+  | 'posts.internal.mediaType'
+  | 'posts.internal.owner'
+  | 'posts.internal.type'
+  | 'id'
+  | 'parent.id'
+  | 'parent.parent.id'
+  | 'parent.parent.parent.id'
+  | 'parent.parent.parent.children'
+  | 'parent.parent.children'
+  | 'parent.parent.children.id'
+  | 'parent.parent.children.children'
+  | 'parent.parent.internal.content'
+  | 'parent.parent.internal.contentDigest'
+  | 'parent.parent.internal.description'
+  | 'parent.parent.internal.fieldOwners'
+  | 'parent.parent.internal.ignoreType'
+  | 'parent.parent.internal.mediaType'
+  | 'parent.parent.internal.owner'
+  | 'parent.parent.internal.type'
+  | 'parent.children'
+  | 'parent.children.id'
+  | 'parent.children.parent.id'
+  | 'parent.children.parent.children'
+  | 'parent.children.children'
+  | 'parent.children.children.id'
+  | 'parent.children.children.children'
+  | 'parent.children.internal.content'
+  | 'parent.children.internal.contentDigest'
+  | 'parent.children.internal.description'
+  | 'parent.children.internal.fieldOwners'
+  | 'parent.children.internal.ignoreType'
+  | 'parent.children.internal.mediaType'
+  | 'parent.children.internal.owner'
+  | 'parent.children.internal.type'
+  | 'parent.internal.content'
+  | 'parent.internal.contentDigest'
+  | 'parent.internal.description'
+  | 'parent.internal.fieldOwners'
+  | 'parent.internal.ignoreType'
+  | 'parent.internal.mediaType'
+  | 'parent.internal.owner'
+  | 'parent.internal.type'
+  | 'children'
+  | 'children.id'
+  | 'children.parent.id'
+  | 'children.parent.parent.id'
+  | 'children.parent.parent.children'
+  | 'children.parent.children'
+  | 'children.parent.children.id'
+  | 'children.parent.children.children'
+  | 'children.parent.internal.content'
+  | 'children.parent.internal.contentDigest'
+  | 'children.parent.internal.description'
+  | 'children.parent.internal.fieldOwners'
+  | 'children.parent.internal.ignoreType'
+  | 'children.parent.internal.mediaType'
+  | 'children.parent.internal.owner'
+  | 'children.parent.internal.type'
+  | 'children.children'
+  | 'children.children.id'
+  | 'children.children.parent.id'
+  | 'children.children.parent.children'
+  | 'children.children.children'
+  | 'children.children.children.id'
+  | 'children.children.children.children'
+  | 'children.children.internal.content'
+  | 'children.children.internal.contentDigest'
+  | 'children.children.internal.description'
+  | 'children.children.internal.fieldOwners'
+  | 'children.children.internal.ignoreType'
+  | 'children.children.internal.mediaType'
+  | 'children.children.internal.owner'
+  | 'children.children.internal.type'
+  | 'children.internal.content'
+  | 'children.internal.contentDigest'
+  | 'children.internal.description'
+  | 'children.internal.fieldOwners'
+  | 'children.internal.ignoreType'
+  | 'children.internal.mediaType'
+  | 'children.internal.owner'
+  | 'children.internal.type'
+  | 'internal.content'
+  | 'internal.contentDigest'
+  | 'internal.description'
+  | 'internal.fieldOwners'
+  | 'internal.ignoreType'
+  | 'internal.mediaType'
+  | 'internal.owner'
+  | 'internal.type';
+
+type VelogTagGroupConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<VelogTagEdge>;
+  readonly nodes: ReadonlyArray<VelogTag>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly max: Maybe<Scalars['Float']>;
+  readonly min: Maybe<Scalars['Float']>;
+  readonly sum: Maybe<Scalars['Float']>;
+  readonly group: ReadonlyArray<VelogTagGroupConnection>;
+  readonly field: Scalars['String'];
+  readonly fieldValue: Maybe<Scalars['String']>;
+};
+
+
+type VelogTagGroupConnection_distinctArgs = {
+  field: VelogTagFieldsEnum;
+};
+
+
+type VelogTagGroupConnection_maxArgs = {
+  field: VelogTagFieldsEnum;
+};
+
+
+type VelogTagGroupConnection_minArgs = {
+  field: VelogTagFieldsEnum;
+};
+
+
+type VelogTagGroupConnection_sumArgs = {
+  field: VelogTagFieldsEnum;
+};
+
+
+type VelogTagGroupConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: VelogTagFieldsEnum;
+};
+
+type VelogTagSortInput = {
+  readonly fields: Maybe<ReadonlyArray<Maybe<VelogTagFieldsEnum>>>;
+  readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
+};
+
+type VelogPostConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<VelogPostEdge>;
+  readonly nodes: ReadonlyArray<VelogPost>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly max: Maybe<Scalars['Float']>;
+  readonly min: Maybe<Scalars['Float']>;
+  readonly sum: Maybe<Scalars['Float']>;
+  readonly group: ReadonlyArray<VelogPostGroupConnection>;
+};
+
+
+type VelogPostConnection_distinctArgs = {
+  field: VelogPostFieldsEnum;
+};
+
+
+type VelogPostConnection_maxArgs = {
+  field: VelogPostFieldsEnum;
+};
+
+
+type VelogPostConnection_minArgs = {
+  field: VelogPostFieldsEnum;
+};
+
+
+type VelogPostConnection_sumArgs = {
+  field: VelogPostFieldsEnum;
+};
+
+
+type VelogPostConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: VelogPostFieldsEnum;
+};
+
+type VelogPostEdge = {
+  readonly next: Maybe<VelogPost>;
+  readonly node: VelogPost;
+  readonly previous: Maybe<VelogPost>;
+};
+
+type VelogPostFieldsEnum =
+  | 'velogId'
+  | 'velogUrl'
+  | 'slug'
+  | 'title'
+  | 'rawContent'
+  | 'shortDescription'
+  | 'thumbnail'
+  | 'publishedAt'
+  | 'updatedAt'
+  | 'author.velogId'
+  | 'author.velogUrl'
+  | 'author.username'
+  | 'author.displayName'
+  | 'author.bio'
+  | 'author.aboutHtml'
+  | 'author.isCertified'
+  | 'author.thumbnail.sourceInstanceName'
+  | 'author.thumbnail.absolutePath'
+  | 'author.thumbnail.relativePath'
+  | 'author.thumbnail.extension'
+  | 'author.thumbnail.size'
+  | 'author.thumbnail.prettySize'
+  | 'author.thumbnail.modifiedTime'
+  | 'author.thumbnail.accessTime'
+  | 'author.thumbnail.changeTime'
+  | 'author.thumbnail.birthTime'
+  | 'author.thumbnail.root'
+  | 'author.thumbnail.dir'
+  | 'author.thumbnail.base'
+  | 'author.thumbnail.ext'
+  | 'author.thumbnail.name'
+  | 'author.thumbnail.relativeDirectory'
+  | 'author.thumbnail.dev'
+  | 'author.thumbnail.mode'
+  | 'author.thumbnail.nlink'
+  | 'author.thumbnail.uid'
+  | 'author.thumbnail.gid'
+  | 'author.thumbnail.rdev'
+  | 'author.thumbnail.ino'
+  | 'author.thumbnail.atimeMs'
+  | 'author.thumbnail.mtimeMs'
+  | 'author.thumbnail.ctimeMs'
+  | 'author.thumbnail.atime'
+  | 'author.thumbnail.mtime'
+  | 'author.thumbnail.ctime'
+  | 'author.thumbnail.birthtime'
+  | 'author.thumbnail.birthtimeMs'
+  | 'author.thumbnail.blksize'
+  | 'author.thumbnail.blocks'
+  | 'author.thumbnail.url'
+  | 'author.thumbnail.publicURL'
+  | 'author.thumbnail.childrenImageSharp'
+  | 'author.thumbnail.childrenImageSharp.gatsbyImageData'
+  | 'author.thumbnail.childrenImageSharp.id'
+  | 'author.thumbnail.childrenImageSharp.children'
+  | 'author.thumbnail.childImageSharp.gatsbyImageData'
+  | 'author.thumbnail.childImageSharp.id'
+  | 'author.thumbnail.childImageSharp.children'
+  | 'author.thumbnail.id'
+  | 'author.thumbnail.parent.id'
+  | 'author.thumbnail.parent.children'
+  | 'author.thumbnail.children'
+  | 'author.thumbnail.children.id'
+  | 'author.thumbnail.children.children'
+  | 'author.thumbnail.internal.content'
+  | 'author.thumbnail.internal.contentDigest'
+  | 'author.thumbnail.internal.description'
+  | 'author.thumbnail.internal.fieldOwners'
+  | 'author.thumbnail.internal.ignoreType'
+  | 'author.thumbnail.internal.mediaType'
+  | 'author.thumbnail.internal.owner'
+  | 'author.thumbnail.internal.type'
+  | 'author.socialProfile.url'
+  | 'author.socialProfile.email'
+  | 'author.socialProfile.github'
+  | 'author.socialProfile.facebook'
+  | 'author.socialProfile.twitter'
+  | 'author.posts'
+  | 'author.posts.velogId'
+  | 'author.posts.velogUrl'
+  | 'author.posts.slug'
+  | 'author.posts.title'
+  | 'author.posts.rawContent'
+  | 'author.posts.shortDescription'
+  | 'author.posts.thumbnail'
+  | 'author.posts.publishedAt'
+  | 'author.posts.updatedAt'
+  | 'author.posts.author.velogId'
+  | 'author.posts.author.velogUrl'
+  | 'author.posts.author.username'
+  | 'author.posts.author.displayName'
+  | 'author.posts.author.bio'
+  | 'author.posts.author.aboutHtml'
+  | 'author.posts.author.isCertified'
+  | 'author.posts.author.posts'
+  | 'author.posts.author.id'
+  | 'author.posts.author.children'
+  | 'author.posts.tags'
+  | 'author.posts.tags.velogId'
+  | 'author.posts.tags.velogUrl'
+  | 'author.posts.tags.name'
+  | 'author.posts.tags.description'
+  | 'author.posts.tags.posts'
+  | 'author.posts.tags.id'
+  | 'author.posts.tags.children'
+  | 'author.posts.series.index'
+  | 'author.posts.id'
+  | 'author.posts.parent.id'
+  | 'author.posts.parent.children'
+  | 'author.posts.children'
+  | 'author.posts.children.id'
+  | 'author.posts.children.children'
+  | 'author.posts.internal.content'
+  | 'author.posts.internal.contentDigest'
+  | 'author.posts.internal.description'
+  | 'author.posts.internal.fieldOwners'
+  | 'author.posts.internal.ignoreType'
+  | 'author.posts.internal.mediaType'
+  | 'author.posts.internal.owner'
+  | 'author.posts.internal.type'
+  | 'author.id'
+  | 'author.parent.id'
+  | 'author.parent.parent.id'
+  | 'author.parent.parent.children'
+  | 'author.parent.children'
+  | 'author.parent.children.id'
+  | 'author.parent.children.children'
+  | 'author.parent.internal.content'
+  | 'author.parent.internal.contentDigest'
+  | 'author.parent.internal.description'
+  | 'author.parent.internal.fieldOwners'
+  | 'author.parent.internal.ignoreType'
+  | 'author.parent.internal.mediaType'
+  | 'author.parent.internal.owner'
+  | 'author.parent.internal.type'
+  | 'author.children'
+  | 'author.children.id'
+  | 'author.children.parent.id'
+  | 'author.children.parent.children'
+  | 'author.children.children'
+  | 'author.children.children.id'
+  | 'author.children.children.children'
+  | 'author.children.internal.content'
+  | 'author.children.internal.contentDigest'
+  | 'author.children.internal.description'
+  | 'author.children.internal.fieldOwners'
+  | 'author.children.internal.ignoreType'
+  | 'author.children.internal.mediaType'
+  | 'author.children.internal.owner'
+  | 'author.children.internal.type'
+  | 'author.internal.content'
+  | 'author.internal.contentDigest'
+  | 'author.internal.description'
+  | 'author.internal.fieldOwners'
+  | 'author.internal.ignoreType'
+  | 'author.internal.mediaType'
+  | 'author.internal.owner'
+  | 'author.internal.type'
+  | 'tags'
+  | 'tags.velogId'
+  | 'tags.velogUrl'
+  | 'tags.owner.velogId'
+  | 'tags.owner.velogUrl'
+  | 'tags.owner.username'
+  | 'tags.owner.displayName'
+  | 'tags.owner.bio'
+  | 'tags.owner.aboutHtml'
+  | 'tags.owner.isCertified'
+  | 'tags.owner.thumbnail.sourceInstanceName'
+  | 'tags.owner.thumbnail.absolutePath'
+  | 'tags.owner.thumbnail.relativePath'
+  | 'tags.owner.thumbnail.extension'
+  | 'tags.owner.thumbnail.size'
+  | 'tags.owner.thumbnail.prettySize'
+  | 'tags.owner.thumbnail.modifiedTime'
+  | 'tags.owner.thumbnail.accessTime'
+  | 'tags.owner.thumbnail.changeTime'
+  | 'tags.owner.thumbnail.birthTime'
+  | 'tags.owner.thumbnail.root'
+  | 'tags.owner.thumbnail.dir'
+  | 'tags.owner.thumbnail.base'
+  | 'tags.owner.thumbnail.ext'
+  | 'tags.owner.thumbnail.name'
+  | 'tags.owner.thumbnail.relativeDirectory'
+  | 'tags.owner.thumbnail.dev'
+  | 'tags.owner.thumbnail.mode'
+  | 'tags.owner.thumbnail.nlink'
+  | 'tags.owner.thumbnail.uid'
+  | 'tags.owner.thumbnail.gid'
+  | 'tags.owner.thumbnail.rdev'
+  | 'tags.owner.thumbnail.ino'
+  | 'tags.owner.thumbnail.atimeMs'
+  | 'tags.owner.thumbnail.mtimeMs'
+  | 'tags.owner.thumbnail.ctimeMs'
+  | 'tags.owner.thumbnail.atime'
+  | 'tags.owner.thumbnail.mtime'
+  | 'tags.owner.thumbnail.ctime'
+  | 'tags.owner.thumbnail.birthtime'
+  | 'tags.owner.thumbnail.birthtimeMs'
+  | 'tags.owner.thumbnail.blksize'
+  | 'tags.owner.thumbnail.blocks'
+  | 'tags.owner.thumbnail.url'
+  | 'tags.owner.thumbnail.publicURL'
+  | 'tags.owner.thumbnail.childrenImageSharp'
+  | 'tags.owner.thumbnail.id'
+  | 'tags.owner.thumbnail.children'
+  | 'tags.owner.socialProfile.url'
+  | 'tags.owner.socialProfile.email'
+  | 'tags.owner.socialProfile.github'
+  | 'tags.owner.socialProfile.facebook'
+  | 'tags.owner.socialProfile.twitter'
+  | 'tags.owner.posts'
+  | 'tags.owner.posts.velogId'
+  | 'tags.owner.posts.velogUrl'
+  | 'tags.owner.posts.slug'
+  | 'tags.owner.posts.title'
+  | 'tags.owner.posts.rawContent'
+  | 'tags.owner.posts.shortDescription'
+  | 'tags.owner.posts.thumbnail'
+  | 'tags.owner.posts.publishedAt'
+  | 'tags.owner.posts.updatedAt'
+  | 'tags.owner.posts.tags'
+  | 'tags.owner.posts.id'
+  | 'tags.owner.posts.children'
+  | 'tags.owner.id'
+  | 'tags.owner.parent.id'
+  | 'tags.owner.parent.children'
+  | 'tags.owner.children'
+  | 'tags.owner.children.id'
+  | 'tags.owner.children.children'
+  | 'tags.owner.internal.content'
+  | 'tags.owner.internal.contentDigest'
+  | 'tags.owner.internal.description'
+  | 'tags.owner.internal.fieldOwners'
+  | 'tags.owner.internal.ignoreType'
+  | 'tags.owner.internal.mediaType'
+  | 'tags.owner.internal.owner'
+  | 'tags.owner.internal.type'
+  | 'tags.name'
+  | 'tags.description'
+  | 'tags.thumbnail.sourceInstanceName'
+  | 'tags.thumbnail.absolutePath'
+  | 'tags.thumbnail.relativePath'
+  | 'tags.thumbnail.extension'
+  | 'tags.thumbnail.size'
+  | 'tags.thumbnail.prettySize'
+  | 'tags.thumbnail.modifiedTime'
+  | 'tags.thumbnail.accessTime'
+  | 'tags.thumbnail.changeTime'
+  | 'tags.thumbnail.birthTime'
+  | 'tags.thumbnail.root'
+  | 'tags.thumbnail.dir'
+  | 'tags.thumbnail.base'
+  | 'tags.thumbnail.ext'
+  | 'tags.thumbnail.name'
+  | 'tags.thumbnail.relativeDirectory'
+  | 'tags.thumbnail.dev'
+  | 'tags.thumbnail.mode'
+  | 'tags.thumbnail.nlink'
+  | 'tags.thumbnail.uid'
+  | 'tags.thumbnail.gid'
+  | 'tags.thumbnail.rdev'
+  | 'tags.thumbnail.ino'
+  | 'tags.thumbnail.atimeMs'
+  | 'tags.thumbnail.mtimeMs'
+  | 'tags.thumbnail.ctimeMs'
+  | 'tags.thumbnail.atime'
+  | 'tags.thumbnail.mtime'
+  | 'tags.thumbnail.ctime'
+  | 'tags.thumbnail.birthtime'
+  | 'tags.thumbnail.birthtimeMs'
+  | 'tags.thumbnail.blksize'
+  | 'tags.thumbnail.blocks'
+  | 'tags.thumbnail.url'
+  | 'tags.thumbnail.publicURL'
+  | 'tags.thumbnail.childrenImageSharp'
+  | 'tags.thumbnail.childrenImageSharp.gatsbyImageData'
+  | 'tags.thumbnail.childrenImageSharp.id'
+  | 'tags.thumbnail.childrenImageSharp.children'
+  | 'tags.thumbnail.childImageSharp.gatsbyImageData'
+  | 'tags.thumbnail.childImageSharp.id'
+  | 'tags.thumbnail.childImageSharp.children'
+  | 'tags.thumbnail.id'
+  | 'tags.thumbnail.parent.id'
+  | 'tags.thumbnail.parent.children'
+  | 'tags.thumbnail.children'
+  | 'tags.thumbnail.children.id'
+  | 'tags.thumbnail.children.children'
+  | 'tags.thumbnail.internal.content'
+  | 'tags.thumbnail.internal.contentDigest'
+  | 'tags.thumbnail.internal.description'
+  | 'tags.thumbnail.internal.fieldOwners'
+  | 'tags.thumbnail.internal.ignoreType'
+  | 'tags.thumbnail.internal.mediaType'
+  | 'tags.thumbnail.internal.owner'
+  | 'tags.thumbnail.internal.type'
+  | 'tags.posts'
+  | 'tags.posts.velogId'
+  | 'tags.posts.velogUrl'
+  | 'tags.posts.slug'
+  | 'tags.posts.title'
+  | 'tags.posts.rawContent'
+  | 'tags.posts.shortDescription'
+  | 'tags.posts.thumbnail'
+  | 'tags.posts.publishedAt'
+  | 'tags.posts.updatedAt'
+  | 'tags.posts.author.velogId'
+  | 'tags.posts.author.velogUrl'
+  | 'tags.posts.author.username'
+  | 'tags.posts.author.displayName'
+  | 'tags.posts.author.bio'
+  | 'tags.posts.author.aboutHtml'
+  | 'tags.posts.author.isCertified'
+  | 'tags.posts.author.posts'
+  | 'tags.posts.author.id'
+  | 'tags.posts.author.children'
+  | 'tags.posts.tags'
+  | 'tags.posts.tags.velogId'
+  | 'tags.posts.tags.velogUrl'
+  | 'tags.posts.tags.name'
+  | 'tags.posts.tags.description'
+  | 'tags.posts.tags.posts'
+  | 'tags.posts.tags.id'
+  | 'tags.posts.tags.children'
+  | 'tags.posts.series.index'
+  | 'tags.posts.id'
+  | 'tags.posts.parent.id'
+  | 'tags.posts.parent.children'
+  | 'tags.posts.children'
+  | 'tags.posts.children.id'
+  | 'tags.posts.children.children'
+  | 'tags.posts.internal.content'
+  | 'tags.posts.internal.contentDigest'
+  | 'tags.posts.internal.description'
+  | 'tags.posts.internal.fieldOwners'
+  | 'tags.posts.internal.ignoreType'
+  | 'tags.posts.internal.mediaType'
+  | 'tags.posts.internal.owner'
+  | 'tags.posts.internal.type'
+  | 'tags.id'
+  | 'tags.parent.id'
+  | 'tags.parent.parent.id'
+  | 'tags.parent.parent.children'
+  | 'tags.parent.children'
+  | 'tags.parent.children.id'
+  | 'tags.parent.children.children'
+  | 'tags.parent.internal.content'
+  | 'tags.parent.internal.contentDigest'
+  | 'tags.parent.internal.description'
+  | 'tags.parent.internal.fieldOwners'
+  | 'tags.parent.internal.ignoreType'
+  | 'tags.parent.internal.mediaType'
+  | 'tags.parent.internal.owner'
+  | 'tags.parent.internal.type'
+  | 'tags.children'
+  | 'tags.children.id'
+  | 'tags.children.parent.id'
+  | 'tags.children.parent.children'
+  | 'tags.children.children'
+  | 'tags.children.children.id'
+  | 'tags.children.children.children'
+  | 'tags.children.internal.content'
+  | 'tags.children.internal.contentDigest'
+  | 'tags.children.internal.description'
+  | 'tags.children.internal.fieldOwners'
+  | 'tags.children.internal.ignoreType'
+  | 'tags.children.internal.mediaType'
+  | 'tags.children.internal.owner'
+  | 'tags.children.internal.type'
+  | 'tags.internal.content'
+  | 'tags.internal.contentDigest'
+  | 'tags.internal.description'
+  | 'tags.internal.fieldOwners'
+  | 'tags.internal.ignoreType'
+  | 'tags.internal.mediaType'
+  | 'tags.internal.owner'
+  | 'tags.internal.type'
+  | 'series.index'
+  | 'series.node.velogId'
+  | 'series.node.velogUrl'
+  | 'series.node.name'
+  | 'series.node.description'
+  | 'series.node.slug'
+  | 'series.node.thumbnail.sourceInstanceName'
+  | 'series.node.thumbnail.absolutePath'
+  | 'series.node.thumbnail.relativePath'
+  | 'series.node.thumbnail.extension'
+  | 'series.node.thumbnail.size'
+  | 'series.node.thumbnail.prettySize'
+  | 'series.node.thumbnail.modifiedTime'
+  | 'series.node.thumbnail.accessTime'
+  | 'series.node.thumbnail.changeTime'
+  | 'series.node.thumbnail.birthTime'
+  | 'series.node.thumbnail.root'
+  | 'series.node.thumbnail.dir'
+  | 'series.node.thumbnail.base'
+  | 'series.node.thumbnail.ext'
+  | 'series.node.thumbnail.name'
+  | 'series.node.thumbnail.relativeDirectory'
+  | 'series.node.thumbnail.dev'
+  | 'series.node.thumbnail.mode'
+  | 'series.node.thumbnail.nlink'
+  | 'series.node.thumbnail.uid'
+  | 'series.node.thumbnail.gid'
+  | 'series.node.thumbnail.rdev'
+  | 'series.node.thumbnail.ino'
+  | 'series.node.thumbnail.atimeMs'
+  | 'series.node.thumbnail.mtimeMs'
+  | 'series.node.thumbnail.ctimeMs'
+  | 'series.node.thumbnail.atime'
+  | 'series.node.thumbnail.mtime'
+  | 'series.node.thumbnail.ctime'
+  | 'series.node.thumbnail.birthtime'
+  | 'series.node.thumbnail.birthtimeMs'
+  | 'series.node.thumbnail.blksize'
+  | 'series.node.thumbnail.blocks'
+  | 'series.node.thumbnail.url'
+  | 'series.node.thumbnail.publicURL'
+  | 'series.node.thumbnail.childrenImageSharp'
+  | 'series.node.thumbnail.id'
+  | 'series.node.thumbnail.children'
+  | 'series.node.owner.velogId'
+  | 'series.node.owner.velogUrl'
+  | 'series.node.owner.username'
+  | 'series.node.owner.displayName'
+  | 'series.node.owner.bio'
+  | 'series.node.owner.aboutHtml'
+  | 'series.node.owner.isCertified'
+  | 'series.node.owner.posts'
+  | 'series.node.owner.id'
+  | 'series.node.owner.children'
+  | 'series.node.posts'
+  | 'series.node.posts.velogId'
+  | 'series.node.posts.velogUrl'
+  | 'series.node.posts.slug'
+  | 'series.node.posts.title'
+  | 'series.node.posts.rawContent'
+  | 'series.node.posts.shortDescription'
+  | 'series.node.posts.thumbnail'
+  | 'series.node.posts.publishedAt'
+  | 'series.node.posts.updatedAt'
+  | 'series.node.posts.tags'
+  | 'series.node.posts.id'
+  | 'series.node.posts.children'
+  | 'series.node.id'
+  | 'series.node.parent.id'
+  | 'series.node.parent.children'
+  | 'series.node.children'
+  | 'series.node.children.id'
+  | 'series.node.children.children'
+  | 'series.node.internal.content'
+  | 'series.node.internal.contentDigest'
+  | 'series.node.internal.description'
+  | 'series.node.internal.fieldOwners'
+  | 'series.node.internal.ignoreType'
+  | 'series.node.internal.mediaType'
+  | 'series.node.internal.owner'
+  | 'series.node.internal.type'
+  | 'id'
+  | 'parent.id'
+  | 'parent.parent.id'
+  | 'parent.parent.parent.id'
+  | 'parent.parent.parent.children'
+  | 'parent.parent.children'
+  | 'parent.parent.children.id'
+  | 'parent.parent.children.children'
+  | 'parent.parent.internal.content'
+  | 'parent.parent.internal.contentDigest'
+  | 'parent.parent.internal.description'
+  | 'parent.parent.internal.fieldOwners'
+  | 'parent.parent.internal.ignoreType'
+  | 'parent.parent.internal.mediaType'
+  | 'parent.parent.internal.owner'
+  | 'parent.parent.internal.type'
+  | 'parent.children'
+  | 'parent.children.id'
+  | 'parent.children.parent.id'
+  | 'parent.children.parent.children'
+  | 'parent.children.children'
+  | 'parent.children.children.id'
+  | 'parent.children.children.children'
+  | 'parent.children.internal.content'
+  | 'parent.children.internal.contentDigest'
+  | 'parent.children.internal.description'
+  | 'parent.children.internal.fieldOwners'
+  | 'parent.children.internal.ignoreType'
+  | 'parent.children.internal.mediaType'
+  | 'parent.children.internal.owner'
+  | 'parent.children.internal.type'
+  | 'parent.internal.content'
+  | 'parent.internal.contentDigest'
+  | 'parent.internal.description'
+  | 'parent.internal.fieldOwners'
+  | 'parent.internal.ignoreType'
+  | 'parent.internal.mediaType'
+  | 'parent.internal.owner'
+  | 'parent.internal.type'
+  | 'children'
+  | 'children.id'
+  | 'children.parent.id'
+  | 'children.parent.parent.id'
+  | 'children.parent.parent.children'
+  | 'children.parent.children'
+  | 'children.parent.children.id'
+  | 'children.parent.children.children'
+  | 'children.parent.internal.content'
+  | 'children.parent.internal.contentDigest'
+  | 'children.parent.internal.description'
+  | 'children.parent.internal.fieldOwners'
+  | 'children.parent.internal.ignoreType'
+  | 'children.parent.internal.mediaType'
+  | 'children.parent.internal.owner'
+  | 'children.parent.internal.type'
+  | 'children.children'
+  | 'children.children.id'
+  | 'children.children.parent.id'
+  | 'children.children.parent.children'
+  | 'children.children.children'
+  | 'children.children.children.id'
+  | 'children.children.children.children'
+  | 'children.children.internal.content'
+  | 'children.children.internal.contentDigest'
+  | 'children.children.internal.description'
+  | 'children.children.internal.fieldOwners'
+  | 'children.children.internal.ignoreType'
+  | 'children.children.internal.mediaType'
+  | 'children.children.internal.owner'
+  | 'children.children.internal.type'
+  | 'children.internal.content'
+  | 'children.internal.contentDigest'
+  | 'children.internal.description'
+  | 'children.internal.fieldOwners'
+  | 'children.internal.ignoreType'
+  | 'children.internal.mediaType'
+  | 'children.internal.owner'
+  | 'children.internal.type'
+  | 'internal.content'
+  | 'internal.contentDigest'
+  | 'internal.description'
+  | 'internal.fieldOwners'
+  | 'internal.ignoreType'
+  | 'internal.mediaType'
+  | 'internal.owner'
+  | 'internal.type';
+
+type VelogPostGroupConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<VelogPostEdge>;
+  readonly nodes: ReadonlyArray<VelogPost>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly max: Maybe<Scalars['Float']>;
+  readonly min: Maybe<Scalars['Float']>;
+  readonly sum: Maybe<Scalars['Float']>;
+  readonly group: ReadonlyArray<VelogPostGroupConnection>;
+  readonly field: Scalars['String'];
+  readonly fieldValue: Maybe<Scalars['String']>;
+};
+
+
+type VelogPostGroupConnection_distinctArgs = {
+  field: VelogPostFieldsEnum;
+};
+
+
+type VelogPostGroupConnection_maxArgs = {
+  field: VelogPostFieldsEnum;
+};
+
+
+type VelogPostGroupConnection_minArgs = {
+  field: VelogPostFieldsEnum;
+};
+
+
+type VelogPostGroupConnection_sumArgs = {
+  field: VelogPostFieldsEnum;
+};
+
+
+type VelogPostGroupConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: VelogPostFieldsEnum;
+};
+
+type VelogPostSortInput = {
+  readonly fields: Maybe<ReadonlyArray<Maybe<VelogPostFieldsEnum>>>;
+  readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
+};
+
+type VelogSeriesConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<VelogSeriesEdge>;
+  readonly nodes: ReadonlyArray<VelogSeries>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly max: Maybe<Scalars['Float']>;
+  readonly min: Maybe<Scalars['Float']>;
+  readonly sum: Maybe<Scalars['Float']>;
+  readonly group: ReadonlyArray<VelogSeriesGroupConnection>;
+};
+
+
+type VelogSeriesConnection_distinctArgs = {
+  field: VelogSeriesFieldsEnum;
+};
+
+
+type VelogSeriesConnection_maxArgs = {
+  field: VelogSeriesFieldsEnum;
+};
+
+
+type VelogSeriesConnection_minArgs = {
+  field: VelogSeriesFieldsEnum;
+};
+
+
+type VelogSeriesConnection_sumArgs = {
+  field: VelogSeriesFieldsEnum;
+};
+
+
+type VelogSeriesConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: VelogSeriesFieldsEnum;
+};
+
+type VelogSeriesEdge = {
+  readonly next: Maybe<VelogSeries>;
+  readonly node: VelogSeries;
+  readonly previous: Maybe<VelogSeries>;
+};
+
+type VelogSeriesFieldsEnum =
+  | 'velogId'
+  | 'velogUrl'
+  | 'name'
+  | 'description'
+  | 'slug'
+  | 'thumbnail.sourceInstanceName'
+  | 'thumbnail.absolutePath'
+  | 'thumbnail.relativePath'
+  | 'thumbnail.extension'
+  | 'thumbnail.size'
+  | 'thumbnail.prettySize'
+  | 'thumbnail.modifiedTime'
+  | 'thumbnail.accessTime'
+  | 'thumbnail.changeTime'
+  | 'thumbnail.birthTime'
+  | 'thumbnail.root'
+  | 'thumbnail.dir'
+  | 'thumbnail.base'
+  | 'thumbnail.ext'
+  | 'thumbnail.name'
+  | 'thumbnail.relativeDirectory'
+  | 'thumbnail.dev'
+  | 'thumbnail.mode'
+  | 'thumbnail.nlink'
+  | 'thumbnail.uid'
+  | 'thumbnail.gid'
+  | 'thumbnail.rdev'
+  | 'thumbnail.ino'
+  | 'thumbnail.atimeMs'
+  | 'thumbnail.mtimeMs'
+  | 'thumbnail.ctimeMs'
+  | 'thumbnail.atime'
+  | 'thumbnail.mtime'
+  | 'thumbnail.ctime'
+  | 'thumbnail.birthtime'
+  | 'thumbnail.birthtimeMs'
+  | 'thumbnail.blksize'
+  | 'thumbnail.blocks'
+  | 'thumbnail.url'
+  | 'thumbnail.publicURL'
+  | 'thumbnail.childrenImageSharp'
+  | 'thumbnail.childrenImageSharp.fixed.base64'
+  | 'thumbnail.childrenImageSharp.fixed.tracedSVG'
+  | 'thumbnail.childrenImageSharp.fixed.aspectRatio'
+  | 'thumbnail.childrenImageSharp.fixed.width'
+  | 'thumbnail.childrenImageSharp.fixed.height'
+  | 'thumbnail.childrenImageSharp.fixed.src'
+  | 'thumbnail.childrenImageSharp.fixed.srcSet'
+  | 'thumbnail.childrenImageSharp.fixed.srcWebp'
+  | 'thumbnail.childrenImageSharp.fixed.srcSetWebp'
+  | 'thumbnail.childrenImageSharp.fixed.originalName'
+  | 'thumbnail.childrenImageSharp.fluid.base64'
+  | 'thumbnail.childrenImageSharp.fluid.tracedSVG'
+  | 'thumbnail.childrenImageSharp.fluid.aspectRatio'
+  | 'thumbnail.childrenImageSharp.fluid.src'
+  | 'thumbnail.childrenImageSharp.fluid.srcSet'
+  | 'thumbnail.childrenImageSharp.fluid.srcWebp'
+  | 'thumbnail.childrenImageSharp.fluid.srcSetWebp'
+  | 'thumbnail.childrenImageSharp.fluid.sizes'
+  | 'thumbnail.childrenImageSharp.fluid.originalImg'
+  | 'thumbnail.childrenImageSharp.fluid.originalName'
+  | 'thumbnail.childrenImageSharp.fluid.presentationWidth'
+  | 'thumbnail.childrenImageSharp.fluid.presentationHeight'
+  | 'thumbnail.childrenImageSharp.gatsbyImageData'
+  | 'thumbnail.childrenImageSharp.original.width'
+  | 'thumbnail.childrenImageSharp.original.height'
+  | 'thumbnail.childrenImageSharp.original.src'
+  | 'thumbnail.childrenImageSharp.resize.src'
+  | 'thumbnail.childrenImageSharp.resize.tracedSVG'
+  | 'thumbnail.childrenImageSharp.resize.width'
+  | 'thumbnail.childrenImageSharp.resize.height'
+  | 'thumbnail.childrenImageSharp.resize.aspectRatio'
+  | 'thumbnail.childrenImageSharp.resize.originalName'
+  | 'thumbnail.childrenImageSharp.id'
+  | 'thumbnail.childrenImageSharp.parent.id'
+  | 'thumbnail.childrenImageSharp.parent.children'
+  | 'thumbnail.childrenImageSharp.children'
+  | 'thumbnail.childrenImageSharp.children.id'
+  | 'thumbnail.childrenImageSharp.children.children'
+  | 'thumbnail.childrenImageSharp.internal.content'
+  | 'thumbnail.childrenImageSharp.internal.contentDigest'
+  | 'thumbnail.childrenImageSharp.internal.description'
+  | 'thumbnail.childrenImageSharp.internal.fieldOwners'
+  | 'thumbnail.childrenImageSharp.internal.ignoreType'
+  | 'thumbnail.childrenImageSharp.internal.mediaType'
+  | 'thumbnail.childrenImageSharp.internal.owner'
+  | 'thumbnail.childrenImageSharp.internal.type'
+  | 'thumbnail.childImageSharp.fixed.base64'
+  | 'thumbnail.childImageSharp.fixed.tracedSVG'
+  | 'thumbnail.childImageSharp.fixed.aspectRatio'
+  | 'thumbnail.childImageSharp.fixed.width'
+  | 'thumbnail.childImageSharp.fixed.height'
+  | 'thumbnail.childImageSharp.fixed.src'
+  | 'thumbnail.childImageSharp.fixed.srcSet'
+  | 'thumbnail.childImageSharp.fixed.srcWebp'
+  | 'thumbnail.childImageSharp.fixed.srcSetWebp'
+  | 'thumbnail.childImageSharp.fixed.originalName'
+  | 'thumbnail.childImageSharp.fluid.base64'
+  | 'thumbnail.childImageSharp.fluid.tracedSVG'
+  | 'thumbnail.childImageSharp.fluid.aspectRatio'
+  | 'thumbnail.childImageSharp.fluid.src'
+  | 'thumbnail.childImageSharp.fluid.srcSet'
+  | 'thumbnail.childImageSharp.fluid.srcWebp'
+  | 'thumbnail.childImageSharp.fluid.srcSetWebp'
+  | 'thumbnail.childImageSharp.fluid.sizes'
+  | 'thumbnail.childImageSharp.fluid.originalImg'
+  | 'thumbnail.childImageSharp.fluid.originalName'
+  | 'thumbnail.childImageSharp.fluid.presentationWidth'
+  | 'thumbnail.childImageSharp.fluid.presentationHeight'
+  | 'thumbnail.childImageSharp.gatsbyImageData'
+  | 'thumbnail.childImageSharp.original.width'
+  | 'thumbnail.childImageSharp.original.height'
+  | 'thumbnail.childImageSharp.original.src'
+  | 'thumbnail.childImageSharp.resize.src'
+  | 'thumbnail.childImageSharp.resize.tracedSVG'
+  | 'thumbnail.childImageSharp.resize.width'
+  | 'thumbnail.childImageSharp.resize.height'
+  | 'thumbnail.childImageSharp.resize.aspectRatio'
+  | 'thumbnail.childImageSharp.resize.originalName'
+  | 'thumbnail.childImageSharp.id'
+  | 'thumbnail.childImageSharp.parent.id'
+  | 'thumbnail.childImageSharp.parent.children'
+  | 'thumbnail.childImageSharp.children'
+  | 'thumbnail.childImageSharp.children.id'
+  | 'thumbnail.childImageSharp.children.children'
+  | 'thumbnail.childImageSharp.internal.content'
+  | 'thumbnail.childImageSharp.internal.contentDigest'
+  | 'thumbnail.childImageSharp.internal.description'
+  | 'thumbnail.childImageSharp.internal.fieldOwners'
+  | 'thumbnail.childImageSharp.internal.ignoreType'
+  | 'thumbnail.childImageSharp.internal.mediaType'
+  | 'thumbnail.childImageSharp.internal.owner'
+  | 'thumbnail.childImageSharp.internal.type'
+  | 'thumbnail.id'
+  | 'thumbnail.parent.id'
+  | 'thumbnail.parent.parent.id'
+  | 'thumbnail.parent.parent.children'
+  | 'thumbnail.parent.children'
+  | 'thumbnail.parent.children.id'
+  | 'thumbnail.parent.children.children'
+  | 'thumbnail.parent.internal.content'
+  | 'thumbnail.parent.internal.contentDigest'
+  | 'thumbnail.parent.internal.description'
+  | 'thumbnail.parent.internal.fieldOwners'
+  | 'thumbnail.parent.internal.ignoreType'
+  | 'thumbnail.parent.internal.mediaType'
+  | 'thumbnail.parent.internal.owner'
+  | 'thumbnail.parent.internal.type'
+  | 'thumbnail.children'
+  | 'thumbnail.children.id'
+  | 'thumbnail.children.parent.id'
+  | 'thumbnail.children.parent.children'
+  | 'thumbnail.children.children'
+  | 'thumbnail.children.children.id'
+  | 'thumbnail.children.children.children'
+  | 'thumbnail.children.internal.content'
+  | 'thumbnail.children.internal.contentDigest'
+  | 'thumbnail.children.internal.description'
+  | 'thumbnail.children.internal.fieldOwners'
+  | 'thumbnail.children.internal.ignoreType'
+  | 'thumbnail.children.internal.mediaType'
+  | 'thumbnail.children.internal.owner'
+  | 'thumbnail.children.internal.type'
+  | 'thumbnail.internal.content'
+  | 'thumbnail.internal.contentDigest'
+  | 'thumbnail.internal.description'
+  | 'thumbnail.internal.fieldOwners'
+  | 'thumbnail.internal.ignoreType'
+  | 'thumbnail.internal.mediaType'
+  | 'thumbnail.internal.owner'
+  | 'thumbnail.internal.type'
+  | 'owner.velogId'
+  | 'owner.velogUrl'
+  | 'owner.username'
+  | 'owner.displayName'
+  | 'owner.bio'
+  | 'owner.aboutHtml'
+  | 'owner.isCertified'
+  | 'owner.thumbnail.sourceInstanceName'
+  | 'owner.thumbnail.absolutePath'
+  | 'owner.thumbnail.relativePath'
+  | 'owner.thumbnail.extension'
+  | 'owner.thumbnail.size'
+  | 'owner.thumbnail.prettySize'
+  | 'owner.thumbnail.modifiedTime'
+  | 'owner.thumbnail.accessTime'
+  | 'owner.thumbnail.changeTime'
+  | 'owner.thumbnail.birthTime'
+  | 'owner.thumbnail.root'
+  | 'owner.thumbnail.dir'
+  | 'owner.thumbnail.base'
+  | 'owner.thumbnail.ext'
+  | 'owner.thumbnail.name'
+  | 'owner.thumbnail.relativeDirectory'
+  | 'owner.thumbnail.dev'
+  | 'owner.thumbnail.mode'
+  | 'owner.thumbnail.nlink'
+  | 'owner.thumbnail.uid'
+  | 'owner.thumbnail.gid'
+  | 'owner.thumbnail.rdev'
+  | 'owner.thumbnail.ino'
+  | 'owner.thumbnail.atimeMs'
+  | 'owner.thumbnail.mtimeMs'
+  | 'owner.thumbnail.ctimeMs'
+  | 'owner.thumbnail.atime'
+  | 'owner.thumbnail.mtime'
+  | 'owner.thumbnail.ctime'
+  | 'owner.thumbnail.birthtime'
+  | 'owner.thumbnail.birthtimeMs'
+  | 'owner.thumbnail.blksize'
+  | 'owner.thumbnail.blocks'
+  | 'owner.thumbnail.url'
+  | 'owner.thumbnail.publicURL'
+  | 'owner.thumbnail.childrenImageSharp'
+  | 'owner.thumbnail.childrenImageSharp.gatsbyImageData'
+  | 'owner.thumbnail.childrenImageSharp.id'
+  | 'owner.thumbnail.childrenImageSharp.children'
+  | 'owner.thumbnail.childImageSharp.gatsbyImageData'
+  | 'owner.thumbnail.childImageSharp.id'
+  | 'owner.thumbnail.childImageSharp.children'
+  | 'owner.thumbnail.id'
+  | 'owner.thumbnail.parent.id'
+  | 'owner.thumbnail.parent.children'
+  | 'owner.thumbnail.children'
+  | 'owner.thumbnail.children.id'
+  | 'owner.thumbnail.children.children'
+  | 'owner.thumbnail.internal.content'
+  | 'owner.thumbnail.internal.contentDigest'
+  | 'owner.thumbnail.internal.description'
+  | 'owner.thumbnail.internal.fieldOwners'
+  | 'owner.thumbnail.internal.ignoreType'
+  | 'owner.thumbnail.internal.mediaType'
+  | 'owner.thumbnail.internal.owner'
+  | 'owner.thumbnail.internal.type'
+  | 'owner.socialProfile.url'
+  | 'owner.socialProfile.email'
+  | 'owner.socialProfile.github'
+  | 'owner.socialProfile.facebook'
+  | 'owner.socialProfile.twitter'
+  | 'owner.posts'
+  | 'owner.posts.velogId'
+  | 'owner.posts.velogUrl'
+  | 'owner.posts.slug'
+  | 'owner.posts.title'
+  | 'owner.posts.rawContent'
+  | 'owner.posts.shortDescription'
+  | 'owner.posts.thumbnail'
+  | 'owner.posts.publishedAt'
+  | 'owner.posts.updatedAt'
+  | 'owner.posts.author.velogId'
+  | 'owner.posts.author.velogUrl'
+  | 'owner.posts.author.username'
+  | 'owner.posts.author.displayName'
+  | 'owner.posts.author.bio'
+  | 'owner.posts.author.aboutHtml'
+  | 'owner.posts.author.isCertified'
+  | 'owner.posts.author.posts'
+  | 'owner.posts.author.id'
+  | 'owner.posts.author.children'
+  | 'owner.posts.tags'
+  | 'owner.posts.tags.velogId'
+  | 'owner.posts.tags.velogUrl'
+  | 'owner.posts.tags.name'
+  | 'owner.posts.tags.description'
+  | 'owner.posts.tags.posts'
+  | 'owner.posts.tags.id'
+  | 'owner.posts.tags.children'
+  | 'owner.posts.series.index'
+  | 'owner.posts.id'
+  | 'owner.posts.parent.id'
+  | 'owner.posts.parent.children'
+  | 'owner.posts.children'
+  | 'owner.posts.children.id'
+  | 'owner.posts.children.children'
+  | 'owner.posts.internal.content'
+  | 'owner.posts.internal.contentDigest'
+  | 'owner.posts.internal.description'
+  | 'owner.posts.internal.fieldOwners'
+  | 'owner.posts.internal.ignoreType'
+  | 'owner.posts.internal.mediaType'
+  | 'owner.posts.internal.owner'
+  | 'owner.posts.internal.type'
+  | 'owner.id'
+  | 'owner.parent.id'
+  | 'owner.parent.parent.id'
+  | 'owner.parent.parent.children'
+  | 'owner.parent.children'
+  | 'owner.parent.children.id'
+  | 'owner.parent.children.children'
+  | 'owner.parent.internal.content'
+  | 'owner.parent.internal.contentDigest'
+  | 'owner.parent.internal.description'
+  | 'owner.parent.internal.fieldOwners'
+  | 'owner.parent.internal.ignoreType'
+  | 'owner.parent.internal.mediaType'
+  | 'owner.parent.internal.owner'
+  | 'owner.parent.internal.type'
+  | 'owner.children'
+  | 'owner.children.id'
+  | 'owner.children.parent.id'
+  | 'owner.children.parent.children'
+  | 'owner.children.children'
+  | 'owner.children.children.id'
+  | 'owner.children.children.children'
+  | 'owner.children.internal.content'
+  | 'owner.children.internal.contentDigest'
+  | 'owner.children.internal.description'
+  | 'owner.children.internal.fieldOwners'
+  | 'owner.children.internal.ignoreType'
+  | 'owner.children.internal.mediaType'
+  | 'owner.children.internal.owner'
+  | 'owner.children.internal.type'
+  | 'owner.internal.content'
+  | 'owner.internal.contentDigest'
+  | 'owner.internal.description'
+  | 'owner.internal.fieldOwners'
+  | 'owner.internal.ignoreType'
+  | 'owner.internal.mediaType'
+  | 'owner.internal.owner'
+  | 'owner.internal.type'
+  | 'posts'
+  | 'posts.velogId'
+  | 'posts.velogUrl'
+  | 'posts.slug'
+  | 'posts.title'
+  | 'posts.rawContent'
+  | 'posts.shortDescription'
+  | 'posts.thumbnail'
+  | 'posts.publishedAt'
+  | 'posts.updatedAt'
+  | 'posts.author.velogId'
+  | 'posts.author.velogUrl'
+  | 'posts.author.username'
+  | 'posts.author.displayName'
+  | 'posts.author.bio'
+  | 'posts.author.aboutHtml'
+  | 'posts.author.isCertified'
+  | 'posts.author.thumbnail.sourceInstanceName'
+  | 'posts.author.thumbnail.absolutePath'
+  | 'posts.author.thumbnail.relativePath'
+  | 'posts.author.thumbnail.extension'
+  | 'posts.author.thumbnail.size'
+  | 'posts.author.thumbnail.prettySize'
+  | 'posts.author.thumbnail.modifiedTime'
+  | 'posts.author.thumbnail.accessTime'
+  | 'posts.author.thumbnail.changeTime'
+  | 'posts.author.thumbnail.birthTime'
+  | 'posts.author.thumbnail.root'
+  | 'posts.author.thumbnail.dir'
+  | 'posts.author.thumbnail.base'
+  | 'posts.author.thumbnail.ext'
+  | 'posts.author.thumbnail.name'
+  | 'posts.author.thumbnail.relativeDirectory'
+  | 'posts.author.thumbnail.dev'
+  | 'posts.author.thumbnail.mode'
+  | 'posts.author.thumbnail.nlink'
+  | 'posts.author.thumbnail.uid'
+  | 'posts.author.thumbnail.gid'
+  | 'posts.author.thumbnail.rdev'
+  | 'posts.author.thumbnail.ino'
+  | 'posts.author.thumbnail.atimeMs'
+  | 'posts.author.thumbnail.mtimeMs'
+  | 'posts.author.thumbnail.ctimeMs'
+  | 'posts.author.thumbnail.atime'
+  | 'posts.author.thumbnail.mtime'
+  | 'posts.author.thumbnail.ctime'
+  | 'posts.author.thumbnail.birthtime'
+  | 'posts.author.thumbnail.birthtimeMs'
+  | 'posts.author.thumbnail.blksize'
+  | 'posts.author.thumbnail.blocks'
+  | 'posts.author.thumbnail.url'
+  | 'posts.author.thumbnail.publicURL'
+  | 'posts.author.thumbnail.childrenImageSharp'
+  | 'posts.author.thumbnail.id'
+  | 'posts.author.thumbnail.children'
+  | 'posts.author.socialProfile.url'
+  | 'posts.author.socialProfile.email'
+  | 'posts.author.socialProfile.github'
+  | 'posts.author.socialProfile.facebook'
+  | 'posts.author.socialProfile.twitter'
+  | 'posts.author.posts'
+  | 'posts.author.posts.velogId'
+  | 'posts.author.posts.velogUrl'
+  | 'posts.author.posts.slug'
+  | 'posts.author.posts.title'
+  | 'posts.author.posts.rawContent'
+  | 'posts.author.posts.shortDescription'
+  | 'posts.author.posts.thumbnail'
+  | 'posts.author.posts.publishedAt'
+  | 'posts.author.posts.updatedAt'
+  | 'posts.author.posts.tags'
+  | 'posts.author.posts.id'
+  | 'posts.author.posts.children'
+  | 'posts.author.id'
+  | 'posts.author.parent.id'
+  | 'posts.author.parent.children'
+  | 'posts.author.children'
+  | 'posts.author.children.id'
+  | 'posts.author.children.children'
+  | 'posts.author.internal.content'
+  | 'posts.author.internal.contentDigest'
+  | 'posts.author.internal.description'
+  | 'posts.author.internal.fieldOwners'
+  | 'posts.author.internal.ignoreType'
+  | 'posts.author.internal.mediaType'
+  | 'posts.author.internal.owner'
+  | 'posts.author.internal.type'
+  | 'posts.tags'
+  | 'posts.tags.velogId'
+  | 'posts.tags.velogUrl'
+  | 'posts.tags.owner.velogId'
+  | 'posts.tags.owner.velogUrl'
+  | 'posts.tags.owner.username'
+  | 'posts.tags.owner.displayName'
+  | 'posts.tags.owner.bio'
+  | 'posts.tags.owner.aboutHtml'
+  | 'posts.tags.owner.isCertified'
+  | 'posts.tags.owner.posts'
+  | 'posts.tags.owner.id'
+  | 'posts.tags.owner.children'
+  | 'posts.tags.name'
+  | 'posts.tags.description'
+  | 'posts.tags.thumbnail.sourceInstanceName'
+  | 'posts.tags.thumbnail.absolutePath'
+  | 'posts.tags.thumbnail.relativePath'
+  | 'posts.tags.thumbnail.extension'
+  | 'posts.tags.thumbnail.size'
+  | 'posts.tags.thumbnail.prettySize'
+  | 'posts.tags.thumbnail.modifiedTime'
+  | 'posts.tags.thumbnail.accessTime'
+  | 'posts.tags.thumbnail.changeTime'
+  | 'posts.tags.thumbnail.birthTime'
+  | 'posts.tags.thumbnail.root'
+  | 'posts.tags.thumbnail.dir'
+  | 'posts.tags.thumbnail.base'
+  | 'posts.tags.thumbnail.ext'
+  | 'posts.tags.thumbnail.name'
+  | 'posts.tags.thumbnail.relativeDirectory'
+  | 'posts.tags.thumbnail.dev'
+  | 'posts.tags.thumbnail.mode'
+  | 'posts.tags.thumbnail.nlink'
+  | 'posts.tags.thumbnail.uid'
+  | 'posts.tags.thumbnail.gid'
+  | 'posts.tags.thumbnail.rdev'
+  | 'posts.tags.thumbnail.ino'
+  | 'posts.tags.thumbnail.atimeMs'
+  | 'posts.tags.thumbnail.mtimeMs'
+  | 'posts.tags.thumbnail.ctimeMs'
+  | 'posts.tags.thumbnail.atime'
+  | 'posts.tags.thumbnail.mtime'
+  | 'posts.tags.thumbnail.ctime'
+  | 'posts.tags.thumbnail.birthtime'
+  | 'posts.tags.thumbnail.birthtimeMs'
+  | 'posts.tags.thumbnail.blksize'
+  | 'posts.tags.thumbnail.blocks'
+  | 'posts.tags.thumbnail.url'
+  | 'posts.tags.thumbnail.publicURL'
+  | 'posts.tags.thumbnail.childrenImageSharp'
+  | 'posts.tags.thumbnail.id'
+  | 'posts.tags.thumbnail.children'
+  | 'posts.tags.posts'
+  | 'posts.tags.posts.velogId'
+  | 'posts.tags.posts.velogUrl'
+  | 'posts.tags.posts.slug'
+  | 'posts.tags.posts.title'
+  | 'posts.tags.posts.rawContent'
+  | 'posts.tags.posts.shortDescription'
+  | 'posts.tags.posts.thumbnail'
+  | 'posts.tags.posts.publishedAt'
+  | 'posts.tags.posts.updatedAt'
+  | 'posts.tags.posts.tags'
+  | 'posts.tags.posts.id'
+  | 'posts.tags.posts.children'
+  | 'posts.tags.id'
+  | 'posts.tags.parent.id'
+  | 'posts.tags.parent.children'
+  | 'posts.tags.children'
+  | 'posts.tags.children.id'
+  | 'posts.tags.children.children'
+  | 'posts.tags.internal.content'
+  | 'posts.tags.internal.contentDigest'
+  | 'posts.tags.internal.description'
+  | 'posts.tags.internal.fieldOwners'
+  | 'posts.tags.internal.ignoreType'
+  | 'posts.tags.internal.mediaType'
+  | 'posts.tags.internal.owner'
+  | 'posts.tags.internal.type'
+  | 'posts.series.index'
+  | 'posts.series.node.velogId'
+  | 'posts.series.node.velogUrl'
+  | 'posts.series.node.name'
+  | 'posts.series.node.description'
+  | 'posts.series.node.slug'
+  | 'posts.series.node.posts'
+  | 'posts.series.node.id'
+  | 'posts.series.node.children'
+  | 'posts.id'
+  | 'posts.parent.id'
+  | 'posts.parent.parent.id'
+  | 'posts.parent.parent.children'
+  | 'posts.parent.children'
+  | 'posts.parent.children.id'
+  | 'posts.parent.children.children'
+  | 'posts.parent.internal.content'
+  | 'posts.parent.internal.contentDigest'
+  | 'posts.parent.internal.description'
+  | 'posts.parent.internal.fieldOwners'
+  | 'posts.parent.internal.ignoreType'
+  | 'posts.parent.internal.mediaType'
+  | 'posts.parent.internal.owner'
+  | 'posts.parent.internal.type'
+  | 'posts.children'
+  | 'posts.children.id'
+  | 'posts.children.parent.id'
+  | 'posts.children.parent.children'
+  | 'posts.children.children'
+  | 'posts.children.children.id'
+  | 'posts.children.children.children'
+  | 'posts.children.internal.content'
+  | 'posts.children.internal.contentDigest'
+  | 'posts.children.internal.description'
+  | 'posts.children.internal.fieldOwners'
+  | 'posts.children.internal.ignoreType'
+  | 'posts.children.internal.mediaType'
+  | 'posts.children.internal.owner'
+  | 'posts.children.internal.type'
+  | 'posts.internal.content'
+  | 'posts.internal.contentDigest'
+  | 'posts.internal.description'
+  | 'posts.internal.fieldOwners'
+  | 'posts.internal.ignoreType'
+  | 'posts.internal.mediaType'
+  | 'posts.internal.owner'
+  | 'posts.internal.type'
+  | 'id'
+  | 'parent.id'
+  | 'parent.parent.id'
+  | 'parent.parent.parent.id'
+  | 'parent.parent.parent.children'
+  | 'parent.parent.children'
+  | 'parent.parent.children.id'
+  | 'parent.parent.children.children'
+  | 'parent.parent.internal.content'
+  | 'parent.parent.internal.contentDigest'
+  | 'parent.parent.internal.description'
+  | 'parent.parent.internal.fieldOwners'
+  | 'parent.parent.internal.ignoreType'
+  | 'parent.parent.internal.mediaType'
+  | 'parent.parent.internal.owner'
+  | 'parent.parent.internal.type'
+  | 'parent.children'
+  | 'parent.children.id'
+  | 'parent.children.parent.id'
+  | 'parent.children.parent.children'
+  | 'parent.children.children'
+  | 'parent.children.children.id'
+  | 'parent.children.children.children'
+  | 'parent.children.internal.content'
+  | 'parent.children.internal.contentDigest'
+  | 'parent.children.internal.description'
+  | 'parent.children.internal.fieldOwners'
+  | 'parent.children.internal.ignoreType'
+  | 'parent.children.internal.mediaType'
+  | 'parent.children.internal.owner'
+  | 'parent.children.internal.type'
+  | 'parent.internal.content'
+  | 'parent.internal.contentDigest'
+  | 'parent.internal.description'
+  | 'parent.internal.fieldOwners'
+  | 'parent.internal.ignoreType'
+  | 'parent.internal.mediaType'
+  | 'parent.internal.owner'
+  | 'parent.internal.type'
+  | 'children'
+  | 'children.id'
+  | 'children.parent.id'
+  | 'children.parent.parent.id'
+  | 'children.parent.parent.children'
+  | 'children.parent.children'
+  | 'children.parent.children.id'
+  | 'children.parent.children.children'
+  | 'children.parent.internal.content'
+  | 'children.parent.internal.contentDigest'
+  | 'children.parent.internal.description'
+  | 'children.parent.internal.fieldOwners'
+  | 'children.parent.internal.ignoreType'
+  | 'children.parent.internal.mediaType'
+  | 'children.parent.internal.owner'
+  | 'children.parent.internal.type'
+  | 'children.children'
+  | 'children.children.id'
+  | 'children.children.parent.id'
+  | 'children.children.parent.children'
+  | 'children.children.children'
+  | 'children.children.children.id'
+  | 'children.children.children.children'
+  | 'children.children.internal.content'
+  | 'children.children.internal.contentDigest'
+  | 'children.children.internal.description'
+  | 'children.children.internal.fieldOwners'
+  | 'children.children.internal.ignoreType'
+  | 'children.children.internal.mediaType'
+  | 'children.children.internal.owner'
+  | 'children.children.internal.type'
+  | 'children.internal.content'
+  | 'children.internal.contentDigest'
+  | 'children.internal.description'
+  | 'children.internal.fieldOwners'
+  | 'children.internal.ignoreType'
+  | 'children.internal.mediaType'
+  | 'children.internal.owner'
+  | 'children.internal.type'
+  | 'internal.content'
+  | 'internal.contentDigest'
+  | 'internal.description'
+  | 'internal.fieldOwners'
+  | 'internal.ignoreType'
+  | 'internal.mediaType'
+  | 'internal.owner'
+  | 'internal.type';
+
+type VelogSeriesGroupConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<VelogSeriesEdge>;
+  readonly nodes: ReadonlyArray<VelogSeries>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly max: Maybe<Scalars['Float']>;
+  readonly min: Maybe<Scalars['Float']>;
+  readonly sum: Maybe<Scalars['Float']>;
+  readonly group: ReadonlyArray<VelogSeriesGroupConnection>;
+  readonly field: Scalars['String'];
+  readonly fieldValue: Maybe<Scalars['String']>;
+};
+
+
+type VelogSeriesGroupConnection_distinctArgs = {
+  field: VelogSeriesFieldsEnum;
+};
+
+
+type VelogSeriesGroupConnection_maxArgs = {
+  field: VelogSeriesFieldsEnum;
+};
+
+
+type VelogSeriesGroupConnection_minArgs = {
+  field: VelogSeriesFieldsEnum;
+};
+
+
+type VelogSeriesGroupConnection_sumArgs = {
+  field: VelogSeriesFieldsEnum;
+};
+
+
+type VelogSeriesGroupConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: VelogSeriesFieldsEnum;
+};
+
+type VelogSeriesSortInput = {
+  readonly fields: Maybe<ReadonlyArray<Maybe<VelogSeriesFieldsEnum>>>;
+  readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
+};
+
+type MarkdownRemarkFrontmatterFilterInput = {
+  readonly title: Maybe<StringQueryOperatorInput>;
+};
+
 type MarkdownHeadingFilterListInput = {
   readonly elemMatch: Maybe<MarkdownHeadingFilterInput>;
 };
@@ -3475,9 +6131,11 @@ type MarkdownRemarkEdge = {
 
 type MarkdownRemarkFieldsEnum =
   | 'id'
+  | 'frontmatter.title'
+  | 'excerpt'
+  | 'rawMarkdownBody'
   | 'html'
   | 'htmlAst'
-  | 'excerpt'
   | 'excerptAst'
   | 'headings'
   | 'headings.id'
@@ -3617,9 +6275,11 @@ type MarkdownRemarkGroupConnection_groupArgs = {
 
 type MarkdownRemarkFilterInput = {
   readonly id: Maybe<StringQueryOperatorInput>;
+  readonly frontmatter: Maybe<MarkdownRemarkFrontmatterFilterInput>;
+  readonly excerpt: Maybe<StringQueryOperatorInput>;
+  readonly rawMarkdownBody: Maybe<StringQueryOperatorInput>;
   readonly html: Maybe<StringQueryOperatorInput>;
   readonly htmlAst: Maybe<JSONQueryOperatorInput>;
-  readonly excerpt: Maybe<StringQueryOperatorInput>;
   readonly excerptAst: Maybe<JSONQueryOperatorInput>;
   readonly headings: Maybe<MarkdownHeadingFilterListInput>;
   readonly timeToRead: Maybe<IntQueryOperatorInput>;
@@ -4079,200 +6739,18 @@ type ImageSharpSortInput = {
   readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
 };
 
-type GraphQLSourceConnection = {
-  readonly totalCount: Scalars['Int'];
-  readonly edges: ReadonlyArray<GraphQLSourceEdge>;
-  readonly nodes: ReadonlyArray<GraphQLSource>;
-  readonly pageInfo: PageInfo;
-  readonly distinct: ReadonlyArray<Scalars['String']>;
-  readonly max: Maybe<Scalars['Float']>;
-  readonly min: Maybe<Scalars['Float']>;
-  readonly sum: Maybe<Scalars['Float']>;
-  readonly group: ReadonlyArray<GraphQLSourceGroupConnection>;
-};
+type PagesQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-type GraphQLSourceConnection_distinctArgs = {
-  field: GraphQLSourceFieldsEnum;
-};
+type PagesQueryQuery = { readonly allSiteFunction: { readonly nodes: ReadonlyArray<Pick<SiteFunction, 'functionRoute'>> }, readonly allSitePage: { readonly nodes: ReadonlyArray<Pick<SitePage, 'path'>> } };
+
+type LatestPostListQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-type GraphQLSourceConnection_maxArgs = {
-  field: GraphQLSourceFieldsEnum;
-};
-
-
-type GraphQLSourceConnection_minArgs = {
-  field: GraphQLSourceFieldsEnum;
-};
-
-
-type GraphQLSourceConnection_sumArgs = {
-  field: GraphQLSourceFieldsEnum;
-};
-
-
-type GraphQLSourceConnection_groupArgs = {
-  skip: Maybe<Scalars['Int']>;
-  limit: Maybe<Scalars['Int']>;
-  field: GraphQLSourceFieldsEnum;
-};
-
-type GraphQLSourceEdge = {
-  readonly next: Maybe<GraphQLSource>;
-  readonly node: GraphQLSource;
-  readonly previous: Maybe<GraphQLSource>;
-};
-
-type GraphQLSourceFieldsEnum =
-  | 'id'
-  | 'parent.id'
-  | 'parent.parent.id'
-  | 'parent.parent.parent.id'
-  | 'parent.parent.parent.children'
-  | 'parent.parent.children'
-  | 'parent.parent.children.id'
-  | 'parent.parent.children.children'
-  | 'parent.parent.internal.content'
-  | 'parent.parent.internal.contentDigest'
-  | 'parent.parent.internal.description'
-  | 'parent.parent.internal.fieldOwners'
-  | 'parent.parent.internal.ignoreType'
-  | 'parent.parent.internal.mediaType'
-  | 'parent.parent.internal.owner'
-  | 'parent.parent.internal.type'
-  | 'parent.children'
-  | 'parent.children.id'
-  | 'parent.children.parent.id'
-  | 'parent.children.parent.children'
-  | 'parent.children.children'
-  | 'parent.children.children.id'
-  | 'parent.children.children.children'
-  | 'parent.children.internal.content'
-  | 'parent.children.internal.contentDigest'
-  | 'parent.children.internal.description'
-  | 'parent.children.internal.fieldOwners'
-  | 'parent.children.internal.ignoreType'
-  | 'parent.children.internal.mediaType'
-  | 'parent.children.internal.owner'
-  | 'parent.children.internal.type'
-  | 'parent.internal.content'
-  | 'parent.internal.contentDigest'
-  | 'parent.internal.description'
-  | 'parent.internal.fieldOwners'
-  | 'parent.internal.ignoreType'
-  | 'parent.internal.mediaType'
-  | 'parent.internal.owner'
-  | 'parent.internal.type'
-  | 'children'
-  | 'children.id'
-  | 'children.parent.id'
-  | 'children.parent.parent.id'
-  | 'children.parent.parent.children'
-  | 'children.parent.children'
-  | 'children.parent.children.id'
-  | 'children.parent.children.children'
-  | 'children.parent.internal.content'
-  | 'children.parent.internal.contentDigest'
-  | 'children.parent.internal.description'
-  | 'children.parent.internal.fieldOwners'
-  | 'children.parent.internal.ignoreType'
-  | 'children.parent.internal.mediaType'
-  | 'children.parent.internal.owner'
-  | 'children.parent.internal.type'
-  | 'children.children'
-  | 'children.children.id'
-  | 'children.children.parent.id'
-  | 'children.children.parent.children'
-  | 'children.children.children'
-  | 'children.children.children.id'
-  | 'children.children.children.children'
-  | 'children.children.internal.content'
-  | 'children.children.internal.contentDigest'
-  | 'children.children.internal.description'
-  | 'children.children.internal.fieldOwners'
-  | 'children.children.internal.ignoreType'
-  | 'children.children.internal.mediaType'
-  | 'children.children.internal.owner'
-  | 'children.children.internal.type'
-  | 'children.internal.content'
-  | 'children.internal.contentDigest'
-  | 'children.internal.description'
-  | 'children.internal.fieldOwners'
-  | 'children.internal.ignoreType'
-  | 'children.internal.mediaType'
-  | 'children.internal.owner'
-  | 'children.internal.type'
-  | 'internal.content'
-  | 'internal.contentDigest'
-  | 'internal.description'
-  | 'internal.fieldOwners'
-  | 'internal.ignoreType'
-  | 'internal.mediaType'
-  | 'internal.owner'
-  | 'internal.type'
-  | 'typeName'
-  | 'fieldName';
-
-type GraphQLSourceGroupConnection = {
-  readonly totalCount: Scalars['Int'];
-  readonly edges: ReadonlyArray<GraphQLSourceEdge>;
-  readonly nodes: ReadonlyArray<GraphQLSource>;
-  readonly pageInfo: PageInfo;
-  readonly distinct: ReadonlyArray<Scalars['String']>;
-  readonly max: Maybe<Scalars['Float']>;
-  readonly min: Maybe<Scalars['Float']>;
-  readonly sum: Maybe<Scalars['Float']>;
-  readonly group: ReadonlyArray<GraphQLSourceGroupConnection>;
-  readonly field: Scalars['String'];
-  readonly fieldValue: Maybe<Scalars['String']>;
-};
-
-
-type GraphQLSourceGroupConnection_distinctArgs = {
-  field: GraphQLSourceFieldsEnum;
-};
-
-
-type GraphQLSourceGroupConnection_maxArgs = {
-  field: GraphQLSourceFieldsEnum;
-};
-
-
-type GraphQLSourceGroupConnection_minArgs = {
-  field: GraphQLSourceFieldsEnum;
-};
-
-
-type GraphQLSourceGroupConnection_sumArgs = {
-  field: GraphQLSourceFieldsEnum;
-};
-
-
-type GraphQLSourceGroupConnection_groupArgs = {
-  skip: Maybe<Scalars['Int']>;
-  limit: Maybe<Scalars['Int']>;
-  field: GraphQLSourceFieldsEnum;
-};
-
-type GraphQLSourceFilterInput = {
-  readonly id: Maybe<StringQueryOperatorInput>;
-  readonly parent: Maybe<NodeFilterInput>;
-  readonly children: Maybe<NodeFilterListInput>;
-  readonly internal: Maybe<InternalFilterInput>;
-  readonly typeName: Maybe<StringQueryOperatorInput>;
-  readonly fieldName: Maybe<StringQueryOperatorInput>;
-};
-
-type GraphQLSourceSortInput = {
-  readonly fields: Maybe<ReadonlyArray<Maybe<GraphQLSourceFieldsEnum>>>;
-  readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
-};
-
-type VelogPostsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-type VelogPostsQuery = { readonly velog: { readonly posts: Maybe<ReadonlyArray<Maybe<Pick<Velog_Post, 'id' | 'title' | 'body'>>>> } };
+type LatestPostListQueryQuery = { readonly allMarkdownRemark: { readonly edges: ReadonlyArray<{ readonly node: (
+        Pick<MarkdownRemark, 'excerpt' | 'id'>
+        & { readonly frontmatter: Maybe<Pick<MarkdownRemarkFrontmatter, 'title'>> }
+      ) }> } };
 
 type GatsbyImageSharpFixedFragment = Pick<ImageSharpFixed, 'base64' | 'width' | 'height' | 'src' | 'srcSet'>;
 

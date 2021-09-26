@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Launch via NPM",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "stopOnEntry": false,
+            "diagnosticLogging": true,
+            "outputCapture": "std",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "debug"
+            ],
+            "port": 9229
+        }
+    ]
+}
