@@ -1,15 +1,14 @@
 import { useStaticQuery, graphql, Link } from 'gatsby';
 
 const LatestPostListQuery = graphql`
-  query LatestPostListQuery {
-    allMarkdownRemark(sort: { order: DESC, fields: frontmatter___title }) {
-      edges {
-        node {
+  query MyAllPosts {
+    velogUser {
+      posts {
+        id
+        title
+        slug
+        childMarkdownRemark {
           excerpt(truncate: true, pruneLength: 200)
-          frontmatter {
-            title
-          }
-          id
         }
       }
     }
@@ -19,17 +18,17 @@ const LatestPostListQuery = graphql`
 const IndexPage = () => {
   const data = useStaticQuery(LatestPostListQuery);
 
+  console.log(JSON.stringify(data, null, 4))
   return (
     <main>
       <h1>최근 작성한 게시글 목록</h1>
       <ul>
-        {data.allMarkdownRemark.edges.map(({ node }: any) => (
-          <li key={node.id}>
+        {data.velogUser.posts.map((post: any) => (
+          <li key={post.id}>
             <h2>
-              <Link to={node.frontmatter.path}>{node.frontmatter.title}</Link>
+              <Link to={`/blog/${post.slug}`}>{post.title}</Link>
             </h2>
-            <h3>{node.frontmatter.date}</h3>
-            <p>{node.excerpt}</p>
+            <p>{post.childMarkdownRemark.excerpt}</p>
             <hr />
           </li>
         ))}
