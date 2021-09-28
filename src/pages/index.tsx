@@ -1,4 +1,6 @@
 import { useStaticQuery, graphql, Link } from 'gatsby';
+import { Card } from '../components/Card';
+import { Layout } from '../layouts/Layout';
 
 const LatestPostListQuery = graphql`
   query MyAllPosts {
@@ -18,22 +20,22 @@ const LatestPostListQuery = graphql`
 const IndexPage = () => {
   const data = useStaticQuery(LatestPostListQuery);
 
-  console.log(JSON.stringify(data, null, 4))
   return (
-    <main>
-      <h1>최근 작성한 게시글 목록</h1>
-      <ul>
+    <Layout>
+      <h3>최근 작성한 게시글 목록</h3>
+      <ul className="list-none space-y-8 pl-0">
         {data.velogUser.posts.map((post: any) => (
           <li key={post.id}>
-            <h2>
-              <Link to={`/blog/${post.slug}`}>{post.title}</Link>
-            </h2>
-            <p>{post.childMarkdownRemark.excerpt}</p>
-            <hr />
+            <Card>
+              <h2>
+                <Link to={`/blog/${post.slug}`}>{post.title}</Link>
+              </h2>
+              <p>{post.childMarkdownRemark.excerpt}</p>
+            </Card>
           </li>
         ))}
       </ul>
-    </main>
+    </Layout>
   );
 };
 export default IndexPage
