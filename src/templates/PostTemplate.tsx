@@ -5,12 +5,11 @@ const Content = React.forwardRef((props: HTMLProps<HTMLDivElement>, ref: Ref<HTM
     <div ref={ref} {...props} />
 )
 
-
 export default function PostTemplate(props: any) {
     const { title, html } = props.pageContext;
     return (
         <Layout>
-            <Content>
+            <Content className="format lg:format-lg dark:format-invert max-w-none">
                 <h2>{title}</h2>
                 <hr />
                 <div dangerouslySetInnerHTML={{ __html: html }} />

@@ -1,6 +1,6 @@
 import { graphql, Link, useStaticQuery } from 'gatsby';
-import { Card } from '../components/Card';
 import { Layout } from '../layouts/Layout';
+import { Card } from 'flowbite-react'
 
 const LatestPostListQuery = graphql`
   query MyAllPosts {
@@ -22,19 +22,23 @@ const IndexPage = () => {
 
   return (
     <Layout>
-      <h3>최근 작성한 게시글 목록</h3>
-      <ul className="list-none space-y-8 pl-0">
-        {data.velogUser.posts.map((post: any) => (
-          <li key={post.id}>
-            <Card>
-              <h2>
-                <Link to={`/blog/${post.slug}`}>{post.title}</Link>
-              </h2>
-              <p>{post.childMarkdownRemark.excerpt}</p>
-            </Card>
-          </li>
-        ))}
-      </ul>
+      <main className='space-y-4'>
+        <h3 className='inline-block text-2xl sm:text-3xl text-slate-900 tracking-tight dark:text-slate-200 format dark:format-invert'>최근 작성한 게시글 목록</h3>
+        <ul className="list-none space-y-8">
+          {data.velogUser.posts.map((post: any) => (
+            <li key={post.id}>
+              <Link to={`/blog/${post.slug}`} className="className='p-0 m-0'">
+                <Card className='format lg:format-lg dark:format-invert max-w-none'>
+                  <h3>
+                    {post.title}
+                  </h3>
+                  <p>{post.childMarkdownRemark.excerpt}</p>
+                </Card>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </main>
     </Layout>
   );
 };

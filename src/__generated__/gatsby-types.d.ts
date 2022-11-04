@@ -7027,10 +7027,5 @@ type WebPOptions = {
   readonly quality: InputMaybe<Scalars['Int']>;
 };
 
-type MyAllPostsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-type MyAllPostsQuery = { readonly velogUser: { readonly posts: ReadonlyArray<{ readonly id: string, readonly title: string, readonly slug: string, readonly childMarkdownRemark: { readonly excerpt: string | null } | null }> } | null };
-
 
 }
