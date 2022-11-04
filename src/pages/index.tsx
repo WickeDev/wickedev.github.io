@@ -28,7 +28,7 @@ const IndexPage = () => {
           {data.velogUser.posts.map((post: any) => (
             <li key={post.id}>
               <Link to={`/blog/${post.slug}`} className="className='p-0 m-0'">
-                <Card className='format lg:format-lg dark:format-invert max-w-none'>
+                <Card className='format dark:format-invert max-w-none'>
                   <h3>
                     {post.title}
                   </h3>
