@@ -1,9 +1,5 @@
-import styled from "@emotion/styled";
+import React, { HTMLProps, Ref } from "react";
 
-export const Card = styled.div`
-    border-radius: 20px;
-    background: #ffffff;
-    box-shadow:  20px 20px 60px #d9d9d9,
-                -20px -20px 60px #ffffff;
-    padding: 1rem;
-`
+export const Card = React.forwardRef((props: HTMLProps<HTMLDivElement>, ref: Ref<HTMLDivElement>) =>
+    <div ref={ref} {...props} />
+)

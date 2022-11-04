@@ -1,28 +1,10 @@
-import styled from "@emotion/styled";
-import { memo } from "react";
+import React, { HTMLProps, Ref } from "react";
 import { Layout } from "../layouts/Layout";
 
-const Content = styled.div`
-    & img {
-        max-height: 100vh;
-        max-width: 100%;
-        width: auto;
-        margin: 2rem auto 0px;
-        height: auto;
-        object-fit: contain;
-        display: block;
-    }
+const Content = React.forwardRef((props: HTMLProps<HTMLDivElement>, ref: Ref<HTMLDivElement>) =>
+    <div ref={ref} {...props} />
+)
 
-    & blockquote {
-        margin: 2rem 0px;
-        border-left: 4px solid rgb(32, 201, 151);
-        border-top-right-radius: 4px;
-        border-bottom-right-radius: 4px;
-        background: rgb(248, 249, 250);
-        padding: 1rem 1rem 1rem 2rem;
-        color: rgb(33, 37, 41);
-    }
-`
 
 export default function PostTemplate(props: any) {
     const { title, html } = props.pageContext;

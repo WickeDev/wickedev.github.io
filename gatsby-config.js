@@ -3,16 +3,17 @@ const { buildSchema, buildClientSchema } = require('graphql')
 
 module.exports = {
   siteMetadata: {
-    siteUrl: "https://www.codesanctum.net",
-    title: "wickedev blog",
+    siteUrl: "https://wickedev.github.io",
+    title: "Wickedev Blog",
   },
+  jsxRuntime: "automatic",
   plugins: [
     {
       resolve: `gatsby-plugin-typescript`,
       options: {
-        isTSX: true,
-        jsxPragma: `@emotion/react`,
-        allExtensions: true,
+        isTSX: true, // defaults to false
+        jsxPragma: `React`, // defaults to "React"
+        allExtensions: true, // defaults to false
       },
     },
     {
@@ -99,7 +100,6 @@ module.exports = {
         ],
       },
     },
-    "gatsby-plugin-emotion",
     "gatsby-plugin-image",
     {
       resolve: "gatsby-plugin-google-analytics",
@@ -107,7 +107,6 @@ module.exports = {
         trackingId: "G-WJH7T7BG1J",
       },
     },
-    "gatsby-plugin-react-helmet",
     "gatsby-plugin-sitemap",
     {
       resolve: "gatsby-plugin-manifest",

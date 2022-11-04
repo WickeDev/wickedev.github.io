@@ -1,4 +1,4 @@
-import { useStaticQuery, graphql, Link } from 'gatsby';
+import { graphql, Link, useStaticQuery } from 'gatsby';
 import { Card } from '../components/Card';
 import { Layout } from '../layouts/Layout';
 
