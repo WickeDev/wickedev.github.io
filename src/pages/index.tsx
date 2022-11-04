@@ -22,8 +22,8 @@ const IndexPage = () => {
 
   return (
     <Layout>
-      <main className='space-y-4'>
-        <h3 className='inline-block text-2xl sm:text-3xl text-slate-900 tracking-tight dark:text-slate-200 format dark:format-invert'>최근 작성한 게시글 목록</h3>
+      <main className='space-y-6 px-16 pt-8 pb-32'>
+        <h2 className='text-3xl format dark:format-invert'>최근 작성한 게시글 목록</h2>
         <ul className="list-none space-y-8">
           {data.velogUser.posts.map((post: any) => (
             <li key={post.id}>

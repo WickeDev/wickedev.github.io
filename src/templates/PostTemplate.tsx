@@ -9,7 +9,7 @@ export default function PostTemplate(props: any) {
     const { title, html } = props.pageContext;
     return (
         <Layout>
-            <Content className="format dark:format-invert max-w-none">
+            <Content className="px-64 16 py-16 format dark:format-invert max-w-none">
                 <h2>{title}</h2>
                 <hr />
                 <div dangerouslySetInnerHTML={{ __html: html }} />

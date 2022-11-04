@@ -4,7 +4,7 @@ import Img from "gatsby-image";
 import React, { HTMLProps, Ref } from 'react';
 
 const Main = React.forwardRef((props: HTMLProps<HTMLDivElement>, ref: Ref<HTMLDivElement>) =>
-    <div className='container mx-auto dark:bg-gray-700' ref={ref} {...props} />
+    <div className='container mx-auto bg-gray-100 dark:bg-gray-700' ref={ref} {...props} />
 )
 
 const Content = React.forwardRef((props: HTMLProps<HTMLDivElement>, ref: Ref<HTMLDivElement>) =>
@@ -47,12 +47,11 @@ export function Layout({ children }: LayoutProps) {
                             Wickedev's Blog
                         </span>
                     </Navbar.Brand>
-                    <Navbar.Toggle />
                     <Navbar.Collapse>
-                        <Navbar.Link href="/">
+                        <Navbar.Link className='text-lg'  href="/">
                             Home
                         </Navbar.Link>
-                        <Navbar.Link href="/about">
+                        <Navbar.Link className='text-lg' href="/about">
                             About
                         </Navbar.Link>
                     </Navbar.Collapse>
