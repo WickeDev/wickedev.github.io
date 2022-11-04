@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkwickedev_blog=self.webpackChunkwickedev_blog||[]).push([[49],{2766:function(e,c,n){n.r(c);var t=n(3369),u=n(5893);c.default=function(){return(0,u.jsx)(t.A,{children:"test"})}}}]);
+//# sourceMappingURL=component---src-pages-about-tsx-4f41183c180325585696.js.map
