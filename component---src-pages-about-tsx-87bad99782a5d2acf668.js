@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkwickedev_blog=self.webpackChunkwickedev_blog||[]).push([[49],{2766:function(e,n,a){a.r(n);var c=a(3369),r=a(5893);n.default=function(){return(0,r.jsx)(c.A,{children:(0,r.jsx)("main",{className:"min-h-screen",children:(0,r.jsx)("p",{className:"format dark:format-invert max-w-none",children:"안녕하세요"})})})}}}]);
+//# sourceMappingURL=component---src-pages-about-tsx-87bad99782a5d2acf668.js.map
