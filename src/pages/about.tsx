@@ -3,7 +3,7 @@ import { Layout } from '../layouts/Layout';
 const AboutPage = () => {
   return (
     <Layout>
-      test
+      안녕하세요
     </Layout>
   );
 };
