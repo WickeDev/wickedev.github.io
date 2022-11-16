@@ -1,0 +1,13 @@
+diff --git a/node_modules/gatsby-source-velog/gatsby-node.js b/node_modules/gatsby-source-velog/gatsby-node.js
+index 1dca768..2961157 100644
+--- a/node_modules/gatsby-source-velog/gatsby-node.js
++++ b/node_modules/gatsby-source-velog/gatsby-node.js
+@@ -172,7 +172,7 @@ const createSchemaCustomization = ({
+       rawContent: 'String!',
+       shortDescription: 'String!',
+       thumbnail: {
+-        type: 'String',
++        type: 'File',
+         extensions: {
+           link: {}
+         }

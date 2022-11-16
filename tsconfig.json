@@ -21,7 +21,11 @@
         "jsx": "react-jsx"
     },
     "include": [
-        "src"
+        "src",
+        "./src/**/*",
+        "./gatsby-node.ts",
+        "./gatsby-config.ts",
+        "./plugins/**/*"
     ],
     "exclude": [
         ".cache"

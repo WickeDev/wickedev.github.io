@@ -8,7 +8,7 @@ const Main = React.forwardRef((props: HTMLProps<HTMLDivElement>, ref: Ref<HTMLDi
 )
 
 const Content = React.forwardRef((props: HTMLProps<HTMLDivElement>, ref: Ref<HTMLDivElement>) =>
-    <div className='p-4' ref={ref} {...props} />
+    <div className='p-8 space-y-8' ref={ref} {...props} />
 )
 
 interface LayoutProps {
@@ -31,13 +31,12 @@ const query = graphql`
 export function Layout({ children }: LayoutProps) {
     const data = useStaticQuery(query)
 
-    return <Flowbite theme={{}}>
+    return <Flowbite>
         <Main>
             <header className='sticky top-0 z-40 flex-none mx-auto w-full bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800'>
                 <Navbar
                     fluid={true}
                     rounded={true}
-
                 >
                     <Navbar.Brand href="/">
                         <Img className="mr-3 h-6 sm:h-9"
@@ -48,7 +47,7 @@ export function Layout({ children }: LayoutProps) {
                         </span>
                     </Navbar.Brand>
                     <Navbar.Collapse>
-                        <Navbar.Link className='text-lg'  href="/">
+                        <Navbar.Link className='text-lg' href="/">
                             Home
                         </Navbar.Link>
                         <Navbar.Link className='text-lg' href="/about">

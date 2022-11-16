@@ -7,6 +7,7 @@ module.exports = {
     title: "Wickedev Blog",
   },
   jsxRuntime: "automatic",
+  graphqlTypegen: true,
   plugins: [
     {
       resolve: `gatsby-plugin-typescript`,
